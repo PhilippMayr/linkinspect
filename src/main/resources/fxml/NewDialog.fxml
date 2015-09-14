@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Spinner?>
+<?import java.lang.Integer?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox  xmlns:fx="http://javafx.com/fxml/1"  xmlns="http://javafx.com/javafx/8" scaleShape="false"  > 
+    
+    <children>
+        <GridPane hgap="10.0" vgap="10.0" >
+            <columnConstraints>
+                <ColumnConstraints hgrow="NEVER"  />
+                <ColumnConstraints hgrow="NEVER" prefWidth="200"/>
+                <ColumnConstraints hgrow="NEVER" prefWidth="100"/>
+            </columnConstraints>
+            <children>
+                
+                <Label text="Link file:" />
+                <TextField fx:id="tfPath" GridPane.columnIndex="1"/>
+                <Button fx:id="btBrowse" text="Browse" GridPane.columnIndex="2" prefWidth="75" onAction="#handleButtonAction" />
+                
+                <Label text="Selection:" GridPane.rowIndex="1" />
+                <ChoiceBox fx:id="cbSelectionMethods" GridPane.rowIndex="1" GridPane.columnIndex="1" scaleShape="true" prefWidth="200"   >
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Random sample"/>
+                            <String fx:value="First findings"/>
+                        </FXCollections>
+                    </items>
+                </ChoiceBox>
+                <Spinner fx:id="spSamples" min="1" max="1000" initialValue="100" GridPane.rowIndex="1" GridPane.columnIndex="2" prefWidth="75">
+                    <editable>true</editable>
+                </Spinner>
+                
+      
+                <Label text="SPARQL source:" GridPane.rowIndex="2" />
+                <TextField fx:id="tfSource" GridPane.rowIndex="2" GridPane.columnIndex="1" promptText="http://localhost:8890/sparql" />
+                
+                <Label text="SPARQL target:" GridPane.rowIndex="3" />
+                <TextField fx:id="tfTarget" GridPane.rowIndex="3" GridPane.columnIndex="1" promptText="http://localhost:8890/sparql" />
+                
+            </children>
+        </GridPane>
+        <FlowPane hgap="10.0"  alignment="BOTTOM_RIGHT" >
+            <children>
+                <Button fx:id="btCancel" mnemonicParsing="false" text="Cancel" onAction="#handleButtonAction" />
+                <Button fx:id="btFinish" mnemonicParsing="false" text="Finish" onAction="#handleButtonAction" />
+            </children>
+        </FlowPane>
+    </children>
+</VBox>
