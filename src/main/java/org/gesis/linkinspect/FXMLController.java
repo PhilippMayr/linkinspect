@@ -326,10 +326,13 @@ public class FXMLController implements Initializable {
             Sample s = testSet.getSample();
             src.requestResource(s.getLeftResource());
             tgt.requestResource(s.getRightResource());
+            rdSourceController.setTitle(s.getLeftResource());
+            rdTargetController.setTitle(s.getRightResource());
         } catch (Exception ex) {
             showExceptionDialog(ex);
             System.exit(-1);
         }
+        
         //adapt button states e.g. grey out next-button at end of set
         determineNavigationButtonStates();
         //set states of toggle buttons according to sample state
