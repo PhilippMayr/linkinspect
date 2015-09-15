@@ -52,14 +52,13 @@ public class Selector {
             int cnt =0; 
             while (reader.hasNext()) {
                 Statement st = reader.readNext();
-                if(cnt < sampleCount){
-                    selection.add(st);
-                    cnt++;
-                }
-                else{
+                selection.add(st);
+                cnt++;
+                if(cnt == sampleCount){
                     break;
                 }
             }
+            reader.close();
             if(cnt < sampleCount){
                 throw new Exception("Less triples available than requested.");
             }

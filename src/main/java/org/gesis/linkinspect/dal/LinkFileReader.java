@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -19,7 +21,8 @@ public class LinkFileReader {
     
     private Queue<Statement> queue = null;
     private File file = null;
-    RDFParser rdfParser= null;
+    private RDFParser rdfParser= null;
+    private FileInputStream fis = null;
     
     /**
      * ctor
@@ -39,7 +42,8 @@ public class LinkFileReader {
      * @throws RDFHandlerException 
      */
     public void startReading() throws IOException, RDFParseException, RDFHandlerException{
-        rdfParser.parse(new FileInputStream(file), "");
+        fis = new FileInputStream(file);
+        rdfParser.parse(fis, "");
     }
     
     /**
@@ -62,10 +66,20 @@ public class LinkFileReader {
      * Resets the reader
      */
     public void reset(){
+        close();
         queue.clear();
         rdfParser = Rio.createParser(RDFFormat.NTRIPLES);
         rdfParser.setRDFHandler(new RDFWriterHandler(queue));
     }    
+
+    public void close() {
+        try {
+            if(fis != null)
+                fis.close();
+        } catch (IOException ex) {
+            Logger.getLogger(LinkFileReader.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
         
 
     

@@ -67,17 +67,21 @@ public class LinkFileChecker {
             }
             if (!st.getPredicate().equals(first.getPredicate())) {
                 System.err.println("Link types are not homogen.");
+                reader.close();
                 return false;
             }
             if (!(st.getObject() instanceof URI)) {
                 System.err.println("Object is not a URI.");
+                reader.close();
                 return false;
             }
             if (st.getSubject().stringValue().equals(st.getObject().stringValue())) {
                 System.err.println("Self-link found.");
+                reader.close();
                 return false;
             }
         }
+        reader.close();
         return true;
     }
 
