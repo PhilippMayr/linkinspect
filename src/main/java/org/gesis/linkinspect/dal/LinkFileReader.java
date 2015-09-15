@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.dal;
 
 import java.io.File;
@@ -18,8 +13,7 @@ import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.Rio;
 
 /**
- *
- * @author bensmafx
+ * Reads a link file
  */
 public class LinkFileReader {
     
@@ -27,6 +21,10 @@ public class LinkFileReader {
     private File file = null;
     RDFParser rdfParser= null;
     
+    /**
+     * ctor
+     * @param file Link file to read
+     */
     public LinkFileReader(File file){
         this.file = file;
         queue = new LinkedList<Statement>();
@@ -34,18 +32,35 @@ public class LinkFileReader {
     
     }
     
+    /**
+     * Starts a reading process
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws RDFHandlerException 
+     */
     public void startReading() throws IOException, RDFParseException, RDFHandlerException{
         rdfParser.parse(new FileInputStream(file), "");
     }
     
+    /**
+     * Returns true if a statement is available
+     * @return 
+     */
     public boolean hasNext(){
         return !queue.isEmpty();
     }
     
+    /**
+     * Extracts the new statement
+     * @return 
+     */
     public Statement readNext(){
         return (Statement) queue.poll();
     }
         
+    /**
+     * Resets the reader
+     */
     public void reset(){
         queue.clear();
         rdfParser = Rio.createParser(RDFFormat.NTRIPLES);

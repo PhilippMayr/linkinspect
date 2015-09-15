@@ -24,8 +24,7 @@ import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.sparql.SPARQLRepository;
 
 /**
- *
- * @author bensmafx
+ * Populates a given list with data from a SPARQL endpoint
  */
 public class SparqlSource {
 
@@ -37,6 +36,13 @@ public class SparqlSource {
         this.observableList = list;
     }
 
+    /**
+     * Request a given resource from the SPARQL endpoint and populate the list with it.
+     * @param resource The resource to request.
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException 
+     */
     @SuppressWarnings("unchecked")
     public void requestResource(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
         observableList.clear();
@@ -59,10 +65,20 @@ public class SparqlSource {
         con.close();
     }
 
+    /**
+     * Not implemented yet
+     * @param resource
+     * @return 
+     */
     public ResourceDescription requestInverse(String resource) {
         return null;
     }
 
+    /**
+     * Connects to a SPARQL endpoint and closes the connection immediately.
+     * @param sparqlEp
+     * @return True, if a connection was made.
+     */
     public static boolean checkConnectivity(String sparqlEp) {
         Repository repo = new SPARQLRepository(sparqlEp);
         try {

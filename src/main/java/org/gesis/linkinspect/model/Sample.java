@@ -8,19 +8,20 @@ package org.gesis.linkinspect.model;
 import org.openrdf.model.Statement;
 
 /**
- *
- * @author bensmafx
+ * Class to store a link-statement and a state.
  */
 public class Sample {
 
     
-    
+    /**
+     * State of sample
+     */
     public enum State{
-        UNDEFINED,
-        OPEN,
-        CORRECT,
-        INCORRECT,
-        UNDECIDABLE
+        UNDEFINED,   //state is undefine, right after instanciation etc.
+        OPEN,        //sample was not evaluated yet
+        CORRECT,     //the sample is correct
+        INCORRECT,   //the sample in incorrect
+        UNDECIDABLE  //the sample is undecidable
     }
     
     
@@ -31,6 +32,11 @@ public class Sample {
         this.statement = stmt;
     }
     
+    /**
+     * Sets the initial state of a sample
+     * @param st
+     * @return 
+     */
     public Sample init(State st){
         this.state=st;
         return this;

@@ -11,7 +11,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
@@ -19,9 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.gesis.linkinspect.model.ResourceProperty;
 
 /**
- * FXML Controller class
- *
- * @author bensmafx
+ * FXML Controller class for the central tableviews
  */
 public class ResourceDisplayController implements Initializable {
 
@@ -31,6 +28,7 @@ public class ResourceDisplayController implements Initializable {
     @FXML
     private TableView tvTable;
     
+    //list to be mirrored by tvTable
     private ObservableList<ResourceProperty> data;
   
     
@@ -43,18 +41,22 @@ public class ResourceDisplayController implements Initializable {
         tvTable.setEditable(false);
         tvTable.getColumns().clear();
         
+        //create left column
         TableColumn<ResourceProperty,String> predicateCol = new TableColumn<ResourceProperty,String>("Predicate");
         predicateCol.setMinWidth(100);    
         predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, String>("predicate"));
         
+        //create right column
         TableColumn<ResourceProperty,String> valueCol = new TableColumn<ResourceProperty,String>("Value");
         valueCol.setMinWidth(100);
         valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, String>("refValue"));
         
-        
+        //create list to be mirrored
         data = FXCollections.observableArrayList();
         
+        //set list
         tvTable.setItems(data);
+        //add columns
         tvTable.getColumns().addAll(predicateCol, valueCol);
     }
     

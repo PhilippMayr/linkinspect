@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect;
 
 import java.io.File;
@@ -25,14 +20,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- * FXML Controller class
- *
- * @author bensmafx
+ * FXML Controller class for the NewDialog
  */
 public class NewDialog extends Stage implements Initializable {
 
+    //click on ok or on cancel
     private boolean successful = false;
     
+    //UI elements
     @FXML
     private TextField tfPath;
 
@@ -57,6 +52,11 @@ public class NewDialog extends Stage implements Initializable {
     @FXML
     private Button btCancel;
 
+    /**
+     * Loads the dialog and initializes it.
+     * @param parent
+     * @param selectionMethods 
+     */
     public NewDialog(Parent parent, String[] selectionMethods) {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/NewDialog.fxml"));
@@ -90,8 +90,13 @@ public class NewDialog extends Stage implements Initializable {
         successful=false;
     }
 
+    /**
+     * Handles clicks to buttons in this dialog
+     * @param event 
+     */
     @FXML
     private void handleButtonAction(ActionEvent event) {
+        //if browse button, select a file
         if (event.getSource() == btBrowse) {
             FileChooser fileChooser = new FileChooser();
             File dir = new File(System.getProperty("user.home"));
@@ -103,10 +108,12 @@ public class NewDialog extends Stage implements Initializable {
                 tfPath.setText(file.getAbsolutePath());
             }
         }
+        //if cancel button, cancel
         else if(event.getSource() == btCancel){
             successful = false;
             this.close();
         }
+        //if finish button, finish
         else if(event.getSource() == btFinish){
             successful = true;
             this.close();

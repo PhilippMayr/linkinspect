@@ -8,8 +8,7 @@ package org.gesis.linkinspect.model;
 import java.util.ArrayList;
 
 /**
- *
- * @author bensmafx
+ * Extends an ArrayList to store ResourcePropertys
  */
 public class ResourceDescription extends ArrayList<ResourceProperty>{
     

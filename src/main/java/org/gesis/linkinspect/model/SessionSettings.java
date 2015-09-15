@@ -8,8 +8,7 @@ package org.gesis.linkinspect.model;
 import java.io.File;
 
 /**
- *
- * @author bensmafx
+ * Class to store session settings.
  */
 public class SessionSettings {
     

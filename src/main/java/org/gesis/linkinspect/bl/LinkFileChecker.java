@@ -14,25 +14,32 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 
 /**
- *
- * @author bensmafx
+ * Class to read in a LinkFile, check if wellformed and to collect basic data.
  */
 public class LinkFileChecker {
-    
+
+    //number of links in this file
     private long linkCount = -1;
+    //type of links
     private String linkType = null;
-    
-    public LinkFileChecker(){
-        
+
+    public LinkFileChecker() {
+
     }
 
     public String getLinkType() {
         return linkType;
     }
-    
-    
-    public boolean checkLinkFile(File file){
-        linkCount =0;
+
+    /**
+     * Reads in the link file, checks if it is wellformed, counts the number of
+     * links and extracts the link type.
+     *
+     * @param file
+     * @return
+     */
+    public boolean checkLinkFile(File file) {
+        linkCount = 0;
         LinkFileReader reader = new LinkFileReader(file);
         try {
             reader.startReading();
@@ -46,27 +53,27 @@ public class LinkFileChecker {
             System.err.println(ex);
             return false;
         }
-        
+
         //all the link types are the same
         //no links to one self
         //all objects are URIs
         Statement first = null;
-        while(reader.hasNext()){
+        while (reader.hasNext()) {
             linkCount++;
             Statement st = reader.readNext();
-            if(first==null){
+            if (first == null) {
                 first = st;
                 linkType = first.getPredicate().stringValue();
             }
-            if( !st.getPredicate().equals(first.getPredicate()) ){
+            if (!st.getPredicate().equals(first.getPredicate())) {
                 System.err.println("Link types are not homogen.");
                 return false;
             }
-            if( ! (st.getObject() instanceof URI) ){
+            if (!(st.getObject() instanceof URI)) {
                 System.err.println("Object is not a URI.");
                 return false;
             }
-            if( st.getSubject().stringValue().equals(st.getObject().stringValue())){
+            if (st.getSubject().stringValue().equals(st.getObject().stringValue())) {
                 System.err.println("Self-link found.");
                 return false;
             }
@@ -77,6 +84,5 @@ public class LinkFileChecker {
     public long getLinkCount() {
         return linkCount;
     }
-    
-    
+
 }

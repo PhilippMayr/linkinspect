@@ -16,8 +16,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParseException;
 
 /**
- *
- * @author bensmafx
+ * Provides methods to select a sample set from a link file.
  */
 public class Selector {
 
@@ -35,6 +34,16 @@ public class Selector {
         return selectionMethods;
     }
 
+    /**
+     * Selects n triples from a link file according to the given method.
+     * @param method Name of method to use
+     * @param file Link file
+     * @param sampleCount Number of samples to select
+     * @throws IOException
+     * @throws RDFParseException
+     * @throws RDFHandlerException
+     * @throws Exception 
+     */
     public void selectFrom(String method, File file, int sampleCount) throws IOException, RDFParseException, RDFHandlerException, Exception {
         if (method.equals(FIRST_N)) {
             LinkFileReader reader = new LinkFileReader(file);
@@ -57,6 +66,11 @@ public class Selector {
         }
     }
     
+    /**
+     * Generates a testset object and populates it with the selected items.
+     * @return The testset
+     * @throws IllegalStateException 
+     */
     public Testset generateTestSet() throws IllegalStateException{
         if(selection.isEmpty()){
             throw new IllegalStateException("A selection has not been done.");

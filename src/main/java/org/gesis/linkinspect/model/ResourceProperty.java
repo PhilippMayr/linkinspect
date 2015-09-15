@@ -9,13 +9,16 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
 /**
- *
- * @author bensmafx
+ * Stores property information
  */
 public class ResourceProperty {
     
+    //predicate
     private URI predicate = null;
+    //direction; forward = resource has...
+    //backward resource is .. of other resourde
     private boolean forward = true;
+    //the other resource or literal
     private Value refValue = null;
     
     
