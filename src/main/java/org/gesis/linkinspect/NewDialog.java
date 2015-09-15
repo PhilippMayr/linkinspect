@@ -136,7 +136,13 @@ public class NewDialog extends Stage implements Initializable {
     
     public int getSampleCount(){
         Object o = spSamples.getValue();
-        return (int)o;
+        if(o instanceof Integer){ //for windows
+            return (int)o;
+        }
+        else if(o instanceof Double){ //for ubuntu
+            return (int)(double)o;
+        }
+        return -1;
     }
 
     public String getSource(){
