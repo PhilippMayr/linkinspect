@@ -245,8 +245,9 @@ public class FXMLController implements Initializable {
 
     /**
      * Initialized the UI-Controls
+     *
      * @param url
-     * @param rb 
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -258,7 +259,8 @@ public class FXMLController implements Initializable {
 
     /**
      * Shows an error dialog
-     * @param msg 
+     *
+     * @param msg
      */
     private void showError(String msg) {
         Alert alert = new Alert(AlertType.ERROR);
@@ -268,10 +270,10 @@ public class FXMLController implements Initializable {
         alert.showAndWait();
     }
 
-    
     /**
      * Shows an exception dialog
-     * @param ex 
+     *
+     * @param ex
      */
     private void showExceptionDialog(Exception ex) {
         Alert alert = new Alert(AlertType.ERROR);
@@ -309,15 +311,15 @@ public class FXMLController implements Initializable {
 
     /**
      * Handles the navigation actions
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void handleNavigationButtonAction(ActionEvent event) {
         //if next, set position to next
         if (event.getSource() == btNext) {
             testSet.goToNext();
-        } 
-        //.. else set position to prev
+        } //.. else set position to prev
         else {
             testSet.goToPrevious();
         }
@@ -332,16 +334,16 @@ public class FXMLController implements Initializable {
             showExceptionDialog(ex);
             System.exit(-1);
         }
-        
+
         //adapt button states e.g. grey out next-button at end of set
         determineNavigationButtonStates();
         //set states of toggle buttons according to sample state
         determineToggleButtonStates();
     }
 
-    
     /**
-     * Sets the states of the navigation buttons according to the sample displayed
+     * Sets the states of the navigation buttons according to the sample
+     * displayed
      */
     private void determineNavigationButtonStates() {
         if (testSet.getSample().getState().equals(State.OPEN) || !testSet.hasNext()) {
@@ -388,10 +390,10 @@ public class FXMLController implements Initializable {
         }
     }
 
-    
     /**
      * Handles toggle button events
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void handleRadioButton(ActionEvent event) {
@@ -403,9 +405,8 @@ public class FXMLController implements Initializable {
                 //revoke state if button was selected before
                 if (sample.getState().equals(Sample.State.CORRECT)) {
                     sample.setState(Sample.State.OPEN);
-                 
-                }
-                //set new state
+
+                } //set new state
                 else {
                     sample.setState(Sample.State.CORRECT);
                 }
@@ -434,7 +435,6 @@ public class FXMLController implements Initializable {
         determineReportButtonStatus();
     }
 
-    
     /**
      * Ungreys the report-button when every sample was inspected
      */
@@ -448,9 +448,9 @@ public class FXMLController implements Initializable {
         }
     }
 
-   /**
-    * Generates TXT-document with the outcome of the inspection
-    */
+    /**
+     * Generates TXT-document with the outcome of the inspection
+     */
     @FXML
     private void generateReport() {
         //show file save dialog
@@ -489,9 +489,18 @@ public class FXMLController implements Initializable {
             ps.println("Incorrect %: " + incorrectPercent);
             ps.println("Undecidable %: " + undecidablePercent);
             ps.close();
-            //open file in system editor
-            Desktop dt = Desktop.getDesktop();
-            dt.open(file);
+            //open file in system editor...
+            if (Desktop.isDesktopSupported() && 
+                    !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
+                Desktop dt = Desktop.getDesktop();
+                dt.open(file);
+            } else {//...show just an info dialog
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Success!");
+                alert.setHeaderText(null);
+                alert.setContentText("A report file was created.\n"+file.getAbsolutePath());
+                alert.showAndWait();
+            }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
