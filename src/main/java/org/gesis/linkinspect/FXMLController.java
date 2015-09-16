@@ -439,13 +439,11 @@ public class FXMLController implements Initializable {
      * Ungreys the report-button when every sample was inspected
      */
     private void determineReportButtonStatus() {
-        if (testSet == null) {
-            btReport.setDisable(true);
+        if(testSet !=null && testSet.getEvaluated() > 0){
+            btReport.setDisable(false);
             return;
         }
-        if (testSet.isComplete()) {
-            btReport.setDisable(false);
-        }
+        btReport.setDisable(true);
     }
 
     /**
@@ -466,7 +464,7 @@ public class FXMLController implements Initializable {
         try {
             PrintStream ps = new PrintStream(file);
             //calculate
-            int g = testSet.size();
+            int g = testSet.getEvaluated();
             int pCorrect = testSet.getCorrect();
             int pIncorrect = testSet.getIncorrect();
             int pUndecidable = testSet.getUndecidable();

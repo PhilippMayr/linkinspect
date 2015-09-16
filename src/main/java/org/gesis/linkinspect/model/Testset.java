@@ -117,5 +117,22 @@ public class Testset extends ArrayList<Sample> {
         }
         return cnt;
     }
+    
+    
+    public int getEvaluated(){
+        int cnt=0; 
+        for (int i = 0; i < size(); i++) {
+            if (get(i).getState().equals(Sample.State.CORRECT)) {
+                cnt++;
+            }
+            else if (get(i).getState().equals(Sample.State.UNDECIDABLE)) {
+                cnt++;
+            }
+            else if (get(i).getState().equals(Sample.State.INCORRECT)) {
+                cnt++;
+            }
+        }
+        return cnt;
+    }
 
 }
