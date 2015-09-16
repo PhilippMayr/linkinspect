@@ -1,11 +1,16 @@
 package org.gesis.linkinspect;
 
+import java.util.Optional;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * Start class for this application
@@ -14,21 +19,40 @@ public class MainApp extends Application {
 
     /**
      * Start application. Loads the main windows.
+     *
      * @param stage
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
-        
+
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
-        
+
         stage.setMinWidth(800);
         stage.setMinHeight(500);
         stage.setTitle("LinkInspect");
         stage.setScene(scene);
+
+        //handle clicks to red cross button
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Please confirm");
+                alert.setHeaderText("Please make sure you generated a report.");
+                alert.setContentText("You are about to close this session. Proceed?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    System.exit(0);
+                } else {
+                    we.consume();
+                }
+            }
+        });
+
         stage.show();
+
     }
 
     /**

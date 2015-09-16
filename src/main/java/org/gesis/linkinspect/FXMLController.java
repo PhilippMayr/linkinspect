@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +22,9 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
@@ -91,6 +94,9 @@ public class FXMLController implements Initializable {
     //generate report button
     @FXML
     private Button btReport;
+
+    @FXML
+    private MenuItem miReport;
 
     //references to lower layer functions
     private Testset testSet = null;
@@ -436,14 +442,17 @@ public class FXMLController implements Initializable {
     }
 
     /**
-     * Ungreys the report-button when every sample was inspected
+     * Ungreys the report-button and report-menuitem as soon as evaluations are
+     * available
      */
     private void determineReportButtonStatus() {
-        if(testSet !=null && testSet.getEvaluated() > 0){
+        if (testSet != null && testSet.getEvaluated() > 0) {
             btReport.setDisable(false);
+            miReport.setDisable(false);
             return;
         }
         btReport.setDisable(true);
+        miReport.setDisable(true);
     }
 
     /**
@@ -488,15 +497,15 @@ public class FXMLController implements Initializable {
             ps.println("Undecidable %: " + undecidablePercent);
             ps.close();
             //open file in system editor...
-            if (Desktop.isDesktopSupported() && 
-                    !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
+            if (Desktop.isDesktopSupported()
+                    && !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
                 Desktop dt = Desktop.getDesktop();
                 dt.open(file);
             } else {//...show just an info dialog
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Success!");
                 alert.setHeaderText(null);
-                alert.setContentText("A report file was created.\n"+file.getAbsolutePath());
+                alert.setContentText("A report file was created.\n" + file.getAbsolutePath());
                 alert.showAndWait();
             }
         } catch (FileNotFoundException ex) {
@@ -505,6 +514,29 @@ public class FXMLController implements Initializable {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    @FXML
+    private void aboutMenuHandler(ActionEvent event) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("About");
+        alert.setHeaderText("Linkinspect v0.1");
+        alert.setContentText("Linkinspect was created in the context of the linked.swissbib project.\n\nVisit us on http://linked.swissbib.ch");
+        alert.showAndWait();
+    }
+
+    @FXML
+    public void exitHandler(ActionEvent event) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Please confirm");
+        alert.setHeaderText("Please make sure you generated a report.");
+        alert.setContentText("You are about to close this session. Proceed?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            System.exit(0);
+        } else {
+            return;
+        }
     }
 
 }
