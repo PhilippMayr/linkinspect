@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,10 +16,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 /**
  * FXML Controller class for the NewDialog
@@ -26,42 +30,44 @@ public class NewDialog extends Stage implements Initializable {
 
     //click on ok or on cancel
     private boolean successful = false;
-    
+
     //UI elements
     @FXML
     private TextField tfPath;
 
     @FXML
     private Button btBrowse;
-    
+
     @FXML
     private ChoiceBox<String> cbSelectionMethods;
-    
+
     @FXML
     private Spinner spSamples;
-    
+
     @FXML
     private TextField tfSource;
-    
+
     @FXML
     private TextField tfTarget;
-    
+
     @FXML
     private Button btFinish;
-    
+
     @FXML
     private Button btCancel;
 
     /**
      * Loads the dialog and initializes it.
+     *
      * @param parent
-     * @param selectionMethods 
+     * @param selectionMethods
      */
+    @SuppressWarnings("unchecked")
     public NewDialog(Parent parent, String[] selectionMethods) {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/NewDialog.fxml"));
         fxmlLoader.setController(this);
-        
+
         // Nice to have this in a load() method instead of constructor, but this seems to be the convention.
         try {
             Scene scene = new Scene((Parent) fxmlLoader.load());
@@ -72,14 +78,40 @@ public class NewDialog extends Stage implements Initializable {
 
         setTitle("Create a new session...");
         initModality(Modality.APPLICATION_MODAL);
-        
+
         successful = false;
-        
+
         cbSelectionMethods.getItems().clear();
         cbSelectionMethods.getItems().addAll(Arrays.asList(selectionMethods));
 
-        btCancel.setCancelButton(true);
+        //work around broken spinner
+        spSamples.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue) {
+                    return;
+                }
+                commitEditorText(spSamples);
+            }
+        });
+        
+        btCancel.setCancelButton(true);
+    }
+
+    private <T> void commitEditorText(Spinner<T> spinner) {
+        if (!spinner.isEditable()) {
+            return;
+        }
+        String text = spinner.getEditor().getText();
+        SpinnerValueFactory<T> valueFactory = spinner.getValueFactory();
+        if (valueFactory != null) {
+            StringConverter<T> converter = valueFactory.getConverter();
+            if (converter != null) {
+                T value = converter.fromString(text);
+                valueFactory.setValue(value);
+            }
+        }
     }
 
     /**
@@ -87,12 +119,13 @@ public class NewDialog extends Stage implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        successful=false;
+        successful = false;
     }
 
     /**
      * Handles clicks to buttons in this dialog
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void handleButtonAction(ActionEvent event) {
@@ -102,55 +135,51 @@ public class NewDialog extends Stage implements Initializable {
             File dir = new File(System.getProperty("user.home"));
             fileChooser.setInitialDirectory(dir);
             fileChooser.setTitle("Open link file");
-            fileChooser.getExtensionFilters().add( new FileChooser.ExtensionFilter("NTriple files (*.nt)", "*.nt"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("NTriple files (*.nt)", "*.nt"));
             File file = fileChooser.showOpenDialog(null);
-            if(file != null){
+            if (file != null) {
                 tfPath.setText(file.getAbsolutePath());
             }
-        }
-        //if cancel button, cancel
-        else if(event.getSource() == btCancel){
+        } //if cancel button, cancel
+        else if (event.getSource() == btCancel) {
             successful = false;
             this.close();
-        }
-        //if finish button, finish
-        else if(event.getSource() == btFinish){
+        } //if finish button, finish
+        else if (event.getSource() == btFinish) {
             successful = true;
             this.close();
         }
-        
 
     }
 
     public boolean isSuccessful() {
         return successful;
     }
-    
-    public String getFilePath(){
+
+    public String getFilePath() {
         return tfPath.getText();
     }
-    
-    public String getSelectionMethod(){
+
+    public String getSelectionMethod() {
         return cbSelectionMethods.getSelectionModel().getSelectedItem();
     }
-    
-    public int getSampleCount(){
+
+    public int getSampleCount() {
         Object o = spSamples.getValue();
-        if(o instanceof Integer){ //for windows
-            return (int)o;
-        }
-        else if(o instanceof Double){ //for ubuntu
-            return (int)(double)o;
+        if (o instanceof Integer) { //for windows
+            return (int) o;
+        } else if (o instanceof Double) { //for ubuntu
+            return (int) (double) o;
         }
         return -1;
     }
 
-    public String getSource(){
+    public String getSource() {
         return tfSource.getText();
     }
-    
-    public String getTarget(){
+
+    public String getTarget() {
         return tfTarget.getText();
     }
-    
+
 }
