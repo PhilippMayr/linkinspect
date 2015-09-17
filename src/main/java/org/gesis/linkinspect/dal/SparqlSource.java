@@ -61,17 +61,34 @@ public class SparqlSource {
             ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), object, true);
             observableList.add(rp);
         }
+        addInverse(resource);
         result.close();
         con.close();
     }
 
     /**
-     * Not implemented yet
+     * Adds resource that reference the given resource to the observable list.
      * @param resource
      * @return 
      */
-    public ResourceDescription requestInverse(String resource) {
-        return null;
+    @SuppressWarnings("unchecked")
+    public void addInverse(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+        Repository repo = new SPARQLRepository(endpoint.toString());
+        repo.initialize();
+        RepositoryConnection con = repo.getConnection();
+        String request = "SELECT ?s ?p WHERE {  ?s ?p <" + resource + ">}";
+        TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
+        query.setIncludeInferred(false);
+        TupleQueryResult result = query.evaluate();
+        while (result.hasNext()) {
+            BindingSet bindingSet = result.next();
+            Value predicate = bindingSet.getValue("p");
+            Value subject = bindingSet.getValue("s");
+            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), subject, false);
+            observableList.add(rp);
+        }
+        result.close();
+        con.close();
     }
 
     /**
