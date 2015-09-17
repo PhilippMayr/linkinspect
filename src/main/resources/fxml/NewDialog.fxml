@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.*?>
 
 
-<VBox  xmlns:fx="http://javafx.com/fxml/1"  xmlns="http://javafx.com/javafx/8" scaleShape="false"  > 
+<VBox xmlns:fx="http://javafx.com/fxml/1"  xmlns="http://javafx.com/javafx/8" scaleShape="false" fx:id="vbFrame" > 
     
     <children>
         <GridPane hgap="10.0" vgap="10.0" >
@@ -31,7 +31,7 @@
             <children>
                 
                 <Label text="Link file:" />
-                <TextField fx:id="tfPath" GridPane.columnIndex="1"/>
+                <TextField fx:id="tfPath" GridPane.columnIndex="1" editable="false" />
                 <Button fx:id="btBrowse" text="Browse" GridPane.columnIndex="2" prefWidth="75" onAction="#handleButtonAction" />
                 
                 <Label text="Selection:" GridPane.rowIndex="1" />
@@ -43,7 +43,7 @@
                         </FXCollections>
                     </items>
                 </ChoiceBox>
-                <Spinner fx:id="spSamples" min="1" max="1000" initialValue="100" GridPane.rowIndex="1" GridPane.columnIndex="2" prefWidth="75">
+                <Spinner fx:id="spSamples" min="1" max="1000" initialValue="100" GridPane.rowIndex="1" GridPane.columnIndex="2" prefWidth="75" disable="true" >
                     <editable>true</editable>
                 </Spinner>
                 

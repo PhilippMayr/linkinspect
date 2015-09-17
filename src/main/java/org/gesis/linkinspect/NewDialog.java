@@ -11,17 +11,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.gesis.linkinspect.bl.LinkFileChecker;
+import org.gesis.linkinspect.model.LinkFile;
 
 /**
  * FXML Controller class for the NewDialog
@@ -32,6 +37,9 @@ public class NewDialog extends Stage implements Initializable {
     private boolean successful = false;
 
     //UI elements
+    @FXML
+    private VBox vbFrame;
+    
     @FXML
     private TextField tfPath;
 
@@ -55,6 +63,9 @@ public class NewDialog extends Stage implements Initializable {
 
     @FXML
     private Button btCancel;
+    
+    
+    private LinkFile linkFile = null;
 
     /**
      * Loads the dialog and initializes it.
@@ -128,6 +139,7 @@ public class NewDialog extends Stage implements Initializable {
      * @param event
      */
     @FXML
+    @SuppressWarnings("unchecked")
     private void handleButtonAction(ActionEvent event) {
         //if browse button, select a file
         if (event.getSource() == btBrowse) {
@@ -140,6 +152,32 @@ public class NewDialog extends Stage implements Initializable {
             if (file != null) {
                 tfPath.setText(file.getAbsolutePath());
             }
+            spSamples.setDisable(true);
+            vbFrame.getScene().setCursor(Cursor.WAIT); 
+            if (!file.exists() || !file.isFile()) {
+                showError("File does not exist or is not a file.");
+                vbFrame.getScene().setCursor(Cursor.DEFAULT);
+                return;
+            }
+            //check link file content
+            LinkFileChecker lfChecker = new LinkFileChecker();
+            boolean fileOk = lfChecker.checkLinkFile(file);
+            if (!fileOk) {
+                showError("Error when reading file.");
+                vbFrame.getScene().setCursor(Cursor.DEFAULT);
+                return;
+            }
+            long linkCount = lfChecker.getLinkCount();
+            if(linkCount <1){
+                showError("Error too less entries found in file. Found "+linkCount);
+                vbFrame.getScene().setCursor(Cursor.DEFAULT);
+                return;
+            }
+            String linkType = lfChecker.getLinkType();
+            linkFile = new LinkFile(file, linkType, linkCount);
+            spSamples.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, (int)linkCount, 20, 5));
+            spSamples.setDisable(false);
+            vbFrame.getScene().setCursor(Cursor.DEFAULT);
         } //if cancel button, cancel
         else if (event.getSource() == btCancel) {
             successful = false;
@@ -151,14 +189,25 @@ public class NewDialog extends Stage implements Initializable {
         }
 
     }
+    
+    /**
+     * Shows an error dialog
+     *
+     * @param msg
+     */
+    private void showError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Ooops, there was an error!");
+        alert.setContentText(msg);
+        alert.showAndWait();
+    }
+    
 
     public boolean isSuccessful() {
         return successful;
     }
 
-    public String getFilePath() {
-        return tfPath.getText();
-    }
 
     public String getSelectionMethod() {
         return cbSelectionMethods.getSelectionModel().getSelectedItem();
@@ -181,5 +230,11 @@ public class NewDialog extends Stage implements Initializable {
     public String getTarget() {
         return tfTarget.getText();
     }
+
+    public LinkFile getLinkFile() {
+        return linkFile;
+    }
+    
+    
 
 }

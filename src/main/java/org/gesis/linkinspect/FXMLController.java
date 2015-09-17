@@ -31,9 +31,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
-import org.gesis.linkinspect.bl.LinkFileChecker;
 import org.gesis.linkinspect.bl.Selector;
 import org.gesis.linkinspect.dal.SparqlSource;
+import org.gesis.linkinspect.model.LinkFile;
 import org.gesis.linkinspect.model.ResourceProperty;
 import org.gesis.linkinspect.model.Sample;
 import org.gesis.linkinspect.model.Sample.State;
@@ -123,22 +123,7 @@ public class FXMLController implements Initializable {
         if (result) {
             //check link file
             bpAll.getScene().setCursor(Cursor.WAIT);
-            File file = new File(newDialog.getFilePath());
-            if (!file.exists() || !file.isFile()) {
-                showError("File does not exist or is not a file.");
-                bpAll.getScene().setCursor(Cursor.DEFAULT);
-                return;
-            }
-            //check link file content
-            LinkFileChecker lfChecker = new LinkFileChecker();
-            boolean fileOk = lfChecker.checkLinkFile(file);
-            if (!fileOk) {
-                showError("Error when reading file.");
-                bpAll.getScene().setCursor(Cursor.DEFAULT);
-                return;
-            }
-            long linkCount = lfChecker.getLinkCount();
-            String linkType = lfChecker.getLinkType();
+            LinkFile linkFile = newDialog.getLinkFile();
             //check selection method
             String selectionMethod = newDialog.getSelectionMethod();
             if (selectionMethod == null || selectionMethod.equals("")) {
@@ -148,7 +133,7 @@ public class FXMLController implements Initializable {
             }
             //check sample count
             int sampleCount = newDialog.getSampleCount();
-            if (sampleCount <= 0 || sampleCount > linkCount) {
+            if (sampleCount <= 0 || sampleCount > linkFile.getLinkCount()) {
                 showError("Invalid sample count.");
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
@@ -182,7 +167,7 @@ public class FXMLController implements Initializable {
             //setup session
             //  select a set of samples
             try {
-                selector.selectFrom(selectionMethod, file, sampleCount);
+                selector.selectFrom(selectionMethod, linkFile.getFile(), sampleCount);
                 testSet = selector.generateTestSet();
             } catch (Exception ex) {
                 showExceptionDialog(ex);
@@ -191,7 +176,7 @@ public class FXMLController implements Initializable {
             }
             //save the settings
             settings = new SessionSettings();
-            settings.setLinkFile(file);
+            settings.setLinkFile(linkFile.getFile());
             settings.setNrOfsamples(sampleCount);
             settings.setSelectMethod(selectionMethod);
             settings.setSrcSparqlEp(source);
@@ -231,9 +216,9 @@ public class FXMLController implements Initializable {
             }
 
             //fill out labels
-            lbFileValue.setText(file.getName());
-            if (linkType != null) {
-                lbLinkTypeValue.setText(linkType);
+            lbFileValue.setText(linkFile.getFile().getName());
+            if (linkFile.getLinkType() != null) {
+                lbLinkTypeValue.setText(linkFile.getLinkType());
             } else {
                 lbLinkTypeValue.setText("not set");
             }
