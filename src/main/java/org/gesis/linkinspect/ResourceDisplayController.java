@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
@@ -42,14 +43,14 @@ public class ResourceDisplayController implements Initializable {
         tvTable.getColumns().clear();
         
         //create left column
-        TableColumn<ResourceProperty,String> predicateCol = new TableColumn<ResourceProperty,String>("Predicate");
+        TableColumn<ResourceProperty,Labeled> predicateCol = new TableColumn<ResourceProperty,Labeled>("Predicate");
         predicateCol.setMinWidth(100);    
-        predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, String>("predicate"));
+        predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Labeled>("predicate"));
         
         //create right column
-        TableColumn<ResourceProperty,String> valueCol = new TableColumn<ResourceProperty,String>("Value");
+        TableColumn<ResourceProperty,Labeled> valueCol = new TableColumn<ResourceProperty,Labeled>("Value");
         valueCol.setMinWidth(100);
-        valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, String>("refValue"));
+        valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Labeled>("refValue"));
         
         //create list to be mirrored
         data = FXCollections.observableArrayList();
