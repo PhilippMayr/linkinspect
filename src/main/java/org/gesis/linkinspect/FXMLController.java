@@ -65,6 +65,9 @@ public class FXMLController implements Initializable {
 
     @FXML
     private Label lbLinkTypeValue;
+    
+    @FXML
+    private Label lbProgressValue;
 
     //central table left
     @FXML
@@ -228,6 +231,7 @@ public class FXMLController implements Initializable {
             //determine button states
             determineNavigationButtonStates();
             determineToggleButtonStates();
+            updateProgress();
 
             bpAll.getScene().setCursor(Cursor.DEFAULT);
             System.out.println("Everything went well.");
@@ -424,6 +428,7 @@ public class FXMLController implements Initializable {
         //set buttons
         determineNavigationButtonStates();
         determineReportButtonStatus();
+        updateProgress();
     }
 
     /**
@@ -521,6 +526,19 @@ public class FXMLController implements Initializable {
             System.exit(0);
         } else {
             return;
+        }
+    }
+    
+    private void updateProgress(){
+        if(testSet != null){
+            float g = testSet.size();
+            float p = testSet.getEvaluated();
+            double p_percent = p/g*100f;
+            p_percent = Math.round(p_percent * 100.0) / 100.0;
+            lbProgressValue.setText(p_percent+"%");
+        }
+        else{
+            lbProgressValue.setText("0.0%");
         }
     }
 

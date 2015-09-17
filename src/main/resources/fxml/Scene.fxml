@@ -43,6 +43,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
                         <Label text="File"/>   
@@ -53,6 +54,8 @@
                         <Label fx:id="lbTargetValue" text="http://localhost:8891/sparql" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="Link type" GridPane.rowIndex="3" />
                         <Label fx:id="lbLinkTypeValue" text="owl:sameAs" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label text="Progress" GridPane.rowIndex="4" />
+                        <Label fx:id="lbProgressValue" text="0.0%" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     </children>
                     <VBox.margin>
                         <Insets left="10.0" right="10.0" />
