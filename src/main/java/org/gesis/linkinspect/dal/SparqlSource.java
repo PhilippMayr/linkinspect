@@ -7,7 +7,6 @@ package org.gesis.linkinspect.dal;
 
 import java.net.URL;
 import javafx.collections.ObservableList;
-import org.gesis.linkinspect.model.ResourceDescription;
 import org.gesis.linkinspect.model.ResourceProperty;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Value;
@@ -58,7 +57,7 @@ public class SparqlSource {
             BindingSet bindingSet = result.next();
             Value predicate = bindingSet.getValue("p");
             Value object = bindingSet.getValue("o");
-            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), object, true);
+            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), object, true, endpoint.toString());
             observableList.add(rp);
         }
         addInverse(resource);
@@ -84,7 +83,7 @@ public class SparqlSource {
             BindingSet bindingSet = result.next();
             Value predicate = bindingSet.getValue("p");
             Value subject = bindingSet.getValue("s");
-            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), subject, false);
+            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), subject, false, endpoint.toString());
             observableList.add(rp);
         }
         result.close();
@@ -106,6 +105,27 @@ public class SparqlSource {
             return false;
         }
         return true;
+    }
+    
+    
+    public static boolean isPresent(String sparqlEp, String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+        Repository repo = new SPARQLRepository(sparqlEp);
+        repo.initialize();
+        RepositoryConnection con = repo.getConnection();
+        String request = "SELECT COUNT (?p) AS ?cnt WHERE { <" + resource + "> ?p ?o}";
+        TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
+        query.setIncludeInferred(false);
+        TupleQueryResult result = query.evaluate();
+        boolean retVal = false;
+        BindingSet bindingSet = result.next();
+        Value v = bindingSet.getValue("cnt");
+        int cnt = Integer.valueOf(v.stringValue());
+        if( cnt > 0) {
+            retVal = true;
+        }
+        result.close();
+        con.close();
+        return retVal;
     }
 
 }

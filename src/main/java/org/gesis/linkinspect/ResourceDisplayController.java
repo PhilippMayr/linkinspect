@@ -44,7 +44,7 @@ public class ResourceDisplayController implements Initializable {
         
         //create left column
         TableColumn<ResourceProperty,Labeled> predicateCol = new TableColumn<ResourceProperty,Labeled>("Predicate");
-        predicateCol.setMinWidth(100);    
+        predicateCol.setMinWidth(100);
         predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Labeled>("predicate"));
         
         //create right column
