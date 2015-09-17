@@ -167,7 +167,7 @@ public class FXMLController implements Initializable {
             //setup session
             //  select a set of samples
             try {
-                selector.selectFrom(selectionMethod, linkFile.getFile(), sampleCount);
+                selector.selectFrom(selectionMethod, linkFile, sampleCount);
                 testSet = selector.generateTestSet();
             } catch (Exception ex) {
                 showExceptionDialog(ex);
