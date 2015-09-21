@@ -18,6 +18,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import org.gesis.linkinspect.ResourceDisplayDialog;
+import org.gesis.linkinspect.bl.NSResolver;
 import org.gesis.linkinspect.dal.SparqlSource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -50,9 +51,9 @@ public class ResourceProperty {
     public Labeled getPredicate() {
         String text = null;
         if (forward) {
-            text = predicate.stringValue();
+            text = NSResolver.getInstance().shorten(predicate.stringValue());
         } else {
-            text = "is " + predicate.stringValue() + " of";
+            text = "is " + NSResolver.getInstance().shorten(predicate.stringValue()) + " of";
         }
         Hyperlink hyperlink = new Hyperlink(text);
         hyperlink.setOnAction(new EventHandler<ActionEvent>() {
@@ -74,7 +75,7 @@ public class ResourceProperty {
 
     public Labeled getRefValue() {
         if (refValue instanceof URI) {
-            Hyperlink hyperlink = new Hyperlink(refValue.stringValue());
+            Hyperlink hyperlink = new Hyperlink(NSResolver.getInstance().shorten(refValue.stringValue()));
             hyperlink.setOnAction(new EventHandler<ActionEvent>() {
 
                 @Override
