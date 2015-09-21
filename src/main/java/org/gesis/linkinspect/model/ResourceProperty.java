@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.Tooltip;
 import org.gesis.linkinspect.ResourceDisplayDialog;
 import org.gesis.linkinspect.bl.NSResolver;
 import org.gesis.linkinspect.dal.SparqlSource;
@@ -56,6 +57,7 @@ public class ResourceProperty {
             text = "is " + NSResolver.getInstance().shorten(predicate.stringValue()) + " of";
         }
         Hyperlink hyperlink = new Hyperlink(text);
+        hyperlink.setTooltip(new Tooltip(predicate.stringValue()));
         hyperlink.setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
@@ -76,6 +78,7 @@ public class ResourceProperty {
     public Labeled getRefValue() {
         if (refValue instanceof URI) {
             Hyperlink hyperlink = new Hyperlink(NSResolver.getInstance().shorten(refValue.stringValue()));
+            hyperlink.setTooltip(new Tooltip(refValue.stringValue()));
             hyperlink.setOnAction(new EventHandler<ActionEvent>() {
 
                 @Override
