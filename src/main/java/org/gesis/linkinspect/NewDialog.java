@@ -94,6 +94,7 @@ public class NewDialog extends Stage implements Initializable {
 
         cbSelectionMethods.getItems().clear();
         cbSelectionMethods.getItems().addAll(Arrays.asList(selectionMethods));
+        cbSelectionMethods.setValue(cbSelectionMethods.getItems().get(0));
 
         //work around broken spinner
         spSamples.focusedProperty().addListener(new ChangeListener<Boolean>() {
