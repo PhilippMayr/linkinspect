@@ -5,6 +5,7 @@
  */
 package org.gesis.linkinspect.model;
 
+import java.util.Date;
 import org.openrdf.model.Statement;
 
 /**
@@ -27,6 +28,7 @@ public class Sample {
     
     private Statement statement = null;
     private State state = State.UNDEFINED;
+    private Date date = null;
     
     public Sample(Statement stmt){
         this.statement = stmt;
@@ -39,6 +41,7 @@ public class Sample {
      */
     public Sample init(State st){
         this.state=st;
+        date = new Date();
         return this;
     }
     
@@ -56,7 +59,14 @@ public class Sample {
 
     public void setState(State state) {
         this.state = state;
+        date = new Date();
     }
+
+    public Date getDate() {
+        return date;
+    }
+    
+    
     
     
     

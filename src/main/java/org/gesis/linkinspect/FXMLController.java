@@ -4,12 +4,10 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -32,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import org.gesis.linkinspect.bl.Selector;
+import org.gesis.linkinspect.dal.ReportWriter;
 import org.gesis.linkinspect.dal.SparqlSource;
 import org.gesis.linkinspect.model.LinkFile;
 import org.gesis.linkinspect.model.ResourceProperty;
@@ -179,7 +178,7 @@ public class FXMLController implements Initializable {
             }
             //save the settings
             settings = new SessionSettings();
-            settings.setLinkFile(linkFile.getFile());
+            settings.setLinkFile(linkFile);
             settings.setNrOfsamples(sampleCount);
             settings.setSelectMethod(selectionMethod);
             settings.setSrcSparqlEp(source);
@@ -461,38 +460,18 @@ public class FXMLController implements Initializable {
             return;
         }
         try {
-            PrintStream ps = new PrintStream(file);
-            //calculate
-            int g = testSet.getEvaluated();
-            int pCorrect = testSet.getCorrect();
-            int pIncorrect = testSet.getIncorrect();
-            int pUndecidable = testSet.getUndecidable();
-            float correctPercent = (100f / g) * pCorrect;
-            float incorrectPercent = (100f / g) * pIncorrect;
-            float undecidablePercent = (100f / g) * pUndecidable;
-            //print to file
-            ps.println("linkinspect report");
-            ps.println();
-            ps.println("Date: " + new Date().toString());
-            ps.println("Source: " + settings.getSrcSparqlEp());
-            ps.println("Target: " + settings.getTrtSparqlEp());
-            ps.println("Link file: " + settings.getLinkFile().getAbsolutePath());
-            ps.println("Select method: " + settings.getSelectMethod());
-            ps.println("Total samples: " + g);
-            ps.println("Correct: " + pCorrect);
-            ps.println("Incorrect: " + pIncorrect);
-            ps.println("Undecidable: " + pUndecidable);
-            ps.println("Correct %: " + correctPercent);
-            ps.println("Incorrect %: " + incorrectPercent);
-            ps.println("Undecidable %: " + undecidablePercent);
-            ps.close();
+            ReportWriter reportWriter = new ReportWriter(testSet,settings);
+            reportWriter.writeReport(file);
+            File csvFile = new File(file.getParentFile(), file.getName().replace("txt","csv"));
+            reportWriter.writeCSV(csvFile);
+            
             //open file in system editor...
             if (Desktop.isDesktopSupported()
                     && !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
                 Desktop dt = Desktop.getDesktop();
                 dt.open(file);
             } else {//...show just an info dialog
-                Alert alert = new Alert(AlertType.INFORMATION);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success!");
                 alert.setHeaderText(null);
                 alert.setContentText("A report file was created.\n" + file.getAbsolutePath());

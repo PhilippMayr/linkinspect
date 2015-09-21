@@ -12,7 +12,7 @@ import java.io.File;
  */
 public class SessionSettings {
     
-    private File linkFile = null;
+    private LinkFile linkFile = null;
     private String selectMethod = null;
     private int nrOfsamples = -1;
     private String srcSparqlEp = null;
@@ -23,11 +23,11 @@ public class SessionSettings {
         
     }
 
-    public File getLinkFile() {
+    public LinkFile getLinkFile() {
         return linkFile;
     }
 
-    public void setLinkFile(File linkFile) {
+    public void setLinkFile(LinkFile linkFile) {
         this.linkFile = linkFile;
     }
 
