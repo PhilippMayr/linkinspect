@@ -78,7 +78,6 @@ public class ReportWriter {
                 ps.print(settings.getTrtSparqlEp());
                 ps.print(z);
                 ps.print(sdf.format(s.getDate()));
-                ps.print(s.getDate());
                 ps.println();
             }
         }

@@ -99,6 +99,12 @@ public class FXMLController implements Initializable {
 
     @FXML
     private MenuItem miReport;
+    
+    @FXML
+    private Button btLog;
+    
+    @FXML
+    private MenuItem miLog;
 
     //references to lower layer functions
     private Testset testSet = null;
@@ -438,10 +444,14 @@ public class FXMLController implements Initializable {
         if (testSet != null && testSet.getEvaluated() > 0) {
             btReport.setDisable(false);
             miReport.setDisable(false);
+            btLog.setDisable(false);
+            miLog.setDisable(false);
             return;
         }
         btReport.setDisable(true);
         miReport.setDisable(true);
+        btLog.setDisable(true);
+        miLog.setDisable(true);
     }
 
     /**
@@ -462,8 +472,6 @@ public class FXMLController implements Initializable {
         try {
             ReportWriter reportWriter = new ReportWriter(testSet,settings);
             reportWriter.writeReport(file);
-            File csvFile = new File(file.getParentFile(), file.getName().replace("txt","csv"));
-            reportWriter.writeCSV(csvFile);
             
             //open file in system editor...
             if (Desktop.isDesktopSupported()
@@ -484,6 +492,43 @@ public class FXMLController implements Initializable {
         }
 
     }
+    
+    @FXML
+    private void writeLog(){
+        //show file save dialog
+        FileChooser fileChooser = new FileChooser();
+        File dir = new File(System.getProperty("user.home"));
+        fileChooser.setInitialDirectory(dir);
+        fileChooser.setTitle("Save log");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        File file = fileChooser.showSaveDialog(null);
+        if (file == null) {
+            return;
+        }
+        try{
+            ReportWriter reportWriter = new ReportWriter(testSet,settings);
+            reportWriter.writeCSV(file);
+        //open file in system editor...
+            if (Desktop.isDesktopSupported()
+                    && !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
+                Desktop dt = Desktop.getDesktop();
+                dt.open(file);
+            } else {//...show just an info dialog
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Success!");
+                alert.setHeaderText(null);
+                alert.setContentText("A report file was created.\n" + file.getAbsolutePath());
+                alert.showAndWait();
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    
+    }
+    
 
     @FXML
     private void aboutMenuHandler(ActionEvent event) {
