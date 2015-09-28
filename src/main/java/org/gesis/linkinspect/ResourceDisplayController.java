@@ -11,11 +11,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.gesis.linkinspect.model.PotentialURI;
+import org.gesis.linkinspect.model.Predicate;
+import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 
 /**
@@ -43,14 +45,17 @@ public class ResourceDisplayController implements Initializable {
         tvTable.getColumns().clear();
         
         //create left column
-        TableColumn<ResourceProperty,Labeled> predicateCol = new TableColumn<ResourceProperty,Labeled>("Predicate");
+        TableColumn<ResourceProperty,Predicate> predicateCol = new TableColumn<ResourceProperty,Predicate>("Predicate");
         predicateCol.setMinWidth(100);
-        predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Labeled>("predicate"));
-        
+        predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Predicate>("predicate"));
+        predicateCol.setCellFactory(new UIFactory4Predicates());
+    
         //create right column
-        TableColumn<ResourceProperty,Labeled> valueCol = new TableColumn<ResourceProperty,Labeled>("Value");
+        TableColumn<ResourceProperty,RDFObject> valueCol = new TableColumn<ResourceProperty,RDFObject>("Value");
         valueCol.setMinWidth(100);
-        valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Labeled>("refValue"));
+        valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, RDFObject>("refValue"));
+        valueCol.setCellFactory(new UIFactory4Objects());
+             
         
         //create list to be mirrored
         data = FXCollections.observableArrayList();

@@ -32,6 +32,7 @@ public class ResourceDisplayDialog extends Stage implements Initializable {
     private ResourceDisplayController rdCentralController;
 
     private String resource = null;
+    private SparqlSource source = null;
 
     public ResourceDisplayDialog(String resource, String sparqlEp) throws MalformedURLException, RepositoryException, MalformedQueryException, QueryEvaluationException {
         this.resource = resource;
@@ -50,9 +51,9 @@ public class ResourceDisplayDialog extends Stage implements Initializable {
 
         rdCentralController.reset();
         ObservableList<ResourceProperty> ol = rdCentralController.getObservableList();
-        SparqlSource s = new SparqlSource(new URL(sparqlEp), ol);
+        source = new SparqlSource(new URL(sparqlEp), ol);
         rdCentralController.setTitle(resource);
-        s.requestResource(resource);
+        source.requestResource(resource);
     }
 
     /**
@@ -61,6 +62,12 @@ public class ResourceDisplayDialog extends Stage implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+    }
+    
+    public void display(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+        this.resource = resource;
+        rdCentralController.setTitle(this.resource);
+        source.requestResource(this.resource);
     }
 
 }

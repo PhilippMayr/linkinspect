@@ -7,6 +7,8 @@ package org.gesis.linkinspect.dal;
 
 import java.net.URL;
 import javafx.collections.ObservableList;
+import org.gesis.linkinspect.model.Predicate;
+import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Value;
@@ -57,7 +59,7 @@ public class SparqlSource {
             BindingSet bindingSet = result.next();
             Value predicate = bindingSet.getValue("p");
             Value object = bindingSet.getValue("o");
-            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), object, true, endpoint.toString());
+            ResourceProperty rp = new ResourceProperty(new Predicate(predicate, true), new RDFObject(object, endpoint.toString()));
             observableList.add(rp);
         }
         addInverse(resource);
@@ -83,7 +85,7 @@ public class SparqlSource {
             BindingSet bindingSet = result.next();
             Value predicate = bindingSet.getValue("p");
             Value subject = bindingSet.getValue("s");
-            ResourceProperty rp = new ResourceProperty(new URIImpl(predicate.stringValue()), subject, false, endpoint.toString());
+            ResourceProperty rp = new ResourceProperty(new Predicate(predicate, false), new RDFObject(subject,endpoint.toString()));
             observableList.add(rp);
         }
         result.close();
