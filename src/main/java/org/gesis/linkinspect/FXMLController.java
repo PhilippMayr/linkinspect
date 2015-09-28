@@ -30,6 +30,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import org.gesis.linkinspect.bl.Selector;
+import org.gesis.linkinspect.dal.PreferenceStorage;
 import org.gesis.linkinspect.dal.ReportWriter;
 import org.gesis.linkinspect.dal.SparqlSource;
 import org.gesis.linkinspect.model.LinkFile;
@@ -182,13 +183,19 @@ public class FXMLController implements Initializable {
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
-            //save the settings
+            //save the settings to RAM
             settings = new SessionSettings();
             settings.setLinkFile(linkFile);
             settings.setNrOfsamples(sampleCount);
             settings.setSelectMethod(selectionMethod);
             settings.setSrcSparqlEp(source);
             settings.setTrtSparqlEp(target);
+            
+            //save the settings to PreferenceStorage
+            PreferenceStorage store = PreferenceStorage.getInstance();
+            store.setSource(source);
+            store.setTarget(target);
+            
             //create access objects to SPARQL endpoints and populate gui
             try {
                 Sample sample = testSet.getSample();
@@ -237,7 +244,7 @@ public class FXMLController implements Initializable {
             determineNavigationButtonStates();
             determineToggleButtonStates();
             updateProgress();
-
+            
             bpAll.getScene().setCursor(Cursor.DEFAULT);
             System.out.println("Everything went well.");
         }

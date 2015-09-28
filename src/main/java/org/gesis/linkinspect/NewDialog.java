@@ -26,6 +26,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.gesis.linkinspect.bl.LinkFileChecker;
+import org.gesis.linkinspect.dal.PreferenceStorage;
 import org.gesis.linkinspect.model.LinkFile;
 
 /**
@@ -39,7 +40,7 @@ public class NewDialog extends Stage implements Initializable {
     //UI elements
     @FXML
     private VBox vbFrame;
-    
+
     @FXML
     private TextField tfPath;
 
@@ -63,8 +64,7 @@ public class NewDialog extends Stage implements Initializable {
 
     @FXML
     private Button btCancel;
-    
-    
+
     private LinkFile linkFile = null;
 
     /**
@@ -92,10 +92,11 @@ public class NewDialog extends Stage implements Initializable {
 
         successful = false;
 
+        //preset a value for the selection method
         cbSelectionMethods.getItems().clear();
         cbSelectionMethods.getItems().addAll(Arrays.asList(selectionMethods));
         cbSelectionMethods.setValue(cbSelectionMethods.getItems().get(0));
-
+     
         //work around broken spinner
         spSamples.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
@@ -108,6 +109,10 @@ public class NewDialog extends Stage implements Initializable {
             }
         });
         
+        //preset a value for SPARQL source and target
+        tfSource.setText(PreferenceStorage.getInstance().getSource());
+        tfTarget.setText(PreferenceStorage.getInstance().getTarget());
+
         btCancel.setCancelButton(true);
     }
 
@@ -154,7 +159,7 @@ public class NewDialog extends Stage implements Initializable {
                 tfPath.setText(file.getAbsolutePath());
             }
             spSamples.setDisable(true);
-            vbFrame.getScene().setCursor(Cursor.WAIT); 
+            vbFrame.getScene().setCursor(Cursor.WAIT);
             if (!file.exists() || !file.isFile()) {
                 showError("File does not exist or is not a file.");
                 vbFrame.getScene().setCursor(Cursor.DEFAULT);
@@ -169,14 +174,14 @@ public class NewDialog extends Stage implements Initializable {
                 return;
             }
             long linkCount = lfChecker.getLinkCount();
-            if(linkCount <1){
-                showError("Error too less entries found in file. Found "+linkCount);
+            if (linkCount < 1) {
+                showError("Error too less entries found in file. Found " + linkCount);
                 vbFrame.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             String linkType = lfChecker.getLinkType();
             linkFile = new LinkFile(file, linkType, linkCount);
-            spSamples.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, (int)linkCount, 20, 5));
+            spSamples.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, (int) linkCount, 20, 5));
             spSamples.setDisable(false);
             vbFrame.getScene().setCursor(Cursor.DEFAULT);
         } //if cancel button, cancel
@@ -190,7 +195,7 @@ public class NewDialog extends Stage implements Initializable {
         }
 
     }
-    
+
     /**
      * Shows an error dialog
      *
@@ -203,12 +208,10 @@ public class NewDialog extends Stage implements Initializable {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-    
 
     public boolean isSuccessful() {
         return successful;
     }
-
 
     public String getSelectionMethod() {
         return cbSelectionMethods.getSelectionModel().getSelectedItem();
@@ -235,7 +238,5 @@ public class NewDialog extends Stage implements Initializable {
     public LinkFile getLinkFile() {
         return linkFile;
     }
-    
-    
 
 }
