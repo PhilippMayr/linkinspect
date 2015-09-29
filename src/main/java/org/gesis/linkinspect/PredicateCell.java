@@ -6,6 +6,9 @@
 package org.gesis.linkinspect;
 
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,9 +16,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
@@ -67,8 +72,42 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
                     }
                 }
             });
+            hyperlink.setContextMenu(prepareContextMenu(true));
         }
     }
+    
+    
+    private ContextMenu prepareContextMenu(boolean withExtern) {
+        ContextMenu menu = new ContextMenu();
+        MenuItem itemCopyClipboard = new MenuItem("Copy to clipboard");
+        itemCopyClipboard.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                StringSelection stringSelection = new StringSelection(currentItem.getValue());
+                Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clpbrd.setContents(stringSelection, null);
+            }
+        });
+        menu.getItems().add(itemCopyClipboard);
+
+        if (withExtern) {
+            MenuItem itemOpenExtern = new MenuItem("Open extern");
+            itemOpenExtern.setOnAction(new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent event) {
+                    if(listener != null){
+                    listener.onOpenExternRequest(currentItem);
+                    }
+                }
+            });
+            menu.getItems().add(itemOpenExtern);
+        }
+        return menu;
+    }
+    
+    
 
     /**
      * Shows an error dialog

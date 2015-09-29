@@ -14,4 +14,5 @@ import org.gesis.linkinspect.model.RDFObject;
 public interface OnObjectClickListener {
     
     public void onObjectClick(RDFObject object);
+    public void onOpenExternRequest(RDFObject object);
 }

@@ -14,5 +14,6 @@ import org.gesis.linkinspect.model.Predicate;
 public interface OnPredicateClickListener {
     
     public void onPredicateClick(Predicate predicate);
+    public void onOpenExternRequest(Predicate predicate);
     
 }

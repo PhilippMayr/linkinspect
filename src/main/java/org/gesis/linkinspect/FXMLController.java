@@ -596,22 +596,37 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
     @Override
     public void onObjectClick(RDFObject object) {
         try {
-
             if (SparqlSource.isPresent(object.getOrigin(), object.getValue())) {
                 ResourceDisplayDialog browser = new ResourceDisplayDialog(object.getValue(), object.getOrigin());
                 browser.showAndWait();
             } else {
-                Desktop desktop = Desktop.getDesktop();
-                java.net.URI uri = java.net.URI.create(object.getValue());
-                try {
-                    desktop.browse(uri);
-                } catch (IOException ex) {
-                    Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                showError("This resource is not available in the triplestore.");
             }
         } catch (Exception ex) {
             showError(ex.getMessage() + "\nPlease try again.");
             System.err.println(ex);
+        }
+    }
+
+    @Override
+    public void onOpenExternRequest(RDFObject object) {
+        Desktop desktop = Desktop.getDesktop();
+        java.net.URI uri = java.net.URI.create(object.getValue());
+        try {
+            desktop.browse(uri);
+        } catch (IOException ex) {
+            showExceptionDialog(ex);
+        }
+    }
+
+    @Override
+    public void onOpenExternRequest(Predicate predicate) {
+        Desktop desktop = Desktop.getDesktop();
+        java.net.URI uri = java.net.URI.create(predicate.getValue());
+        try {
+            desktop.browse(uri);
+        } catch (IOException ex) {
+            showExceptionDialog(ex);
         }
     }
 

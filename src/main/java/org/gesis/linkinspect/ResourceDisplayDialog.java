@@ -117,6 +117,28 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
         }
     }
     
+    @Override
+    public void onOpenExternRequest(RDFObject object) {
+        Desktop desktop = Desktop.getDesktop();
+        java.net.URI uri = java.net.URI.create(object.getValue());
+        try {
+            desktop.browse(uri);
+        } catch (IOException ex) {
+            showError(ex.getMessage());
+        }
+    }
+    
+    @Override
+    public void onOpenExternRequest(Predicate predicate) {
+        Desktop desktop = Desktop.getDesktop();
+        java.net.URI uri = java.net.URI.create(predicate.getValue());
+        try {
+            desktop.browse(uri);
+        } catch (IOException ex) {
+            showError(ex.getMessage());
+        }
+    }
+    
     
     /**
      * Shows an error dialog
