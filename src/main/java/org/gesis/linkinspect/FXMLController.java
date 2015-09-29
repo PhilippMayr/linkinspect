@@ -236,7 +236,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 return;
             }
 
-            //fill out labels
+            //fill out information labels
             lbFileValue.setText(linkFile.getFile().getName());
             if (linkFile.getLinkType() != null) {
                 lbLinkTypeValue.setText(linkFile.getLinkType());
@@ -468,7 +468,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
     }
 
     /**
-     * Generates TXT-document with the outcome of the inspection
+     * Generates a TXT-document with the outcome of the inspection
      */
     @FXML
     private void generateReport() {
@@ -506,6 +506,9 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
 
     }
 
+    /**
+     * Writes a CSV file with every sample and its evaluation
+     */
     @FXML
     private void writeLog() {
         //show file save dialog
@@ -541,6 +544,11 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
 
     }
 
+    
+    /**
+     * Reacts on the About-menu item
+     * @param event 
+     */
     @FXML
     private void aboutMenuHandler(ActionEvent event) {
         Alert alert = new Alert(AlertType.INFORMATION);
@@ -550,6 +558,10 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         alert.showAndWait();
     }
 
+    /**
+     * Reacts on close events and shows an "Are you sure"-dialog.
+     * @param event 
+     */
     @FXML
     public void exitHandler(ActionEvent event) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -564,6 +576,9 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         }
     }
 
+    /**
+     * Updates the progress label
+     */
     private void updateProgress() {
         if (testSet != null) {
             float g = testSet.size();
@@ -576,6 +591,10 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         }
     }
 
+    /**
+     * Reacts to click on a predicate
+     * @param predicate 
+     */
     @Override
     public void onPredicateClick(Predicate predicate) {
         try {
@@ -593,6 +612,10 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         }
     }
 
+    /**
+     * Reacts to click on an object
+     * @param object 
+     */
     @Override
     public void onObjectClick(RDFObject object) {
         try {
@@ -608,6 +631,11 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         }
     }
 
+    
+    /**
+     * Reacts to open-extern-requests by trying to open the system web browser with the given object.
+     * @param object 
+     */
     @Override
     public void onOpenExternRequest(RDFObject object) {
         Desktop desktop = Desktop.getDesktop();
@@ -619,6 +647,10 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         }
     }
 
+    /**
+     * Reacts to open-extern-requests by trying to open the system web browser with the given object.
+     * @param predicate 
+     */
     @Override
     public void onOpenExternRequest(Predicate predicate) {
         Desktop desktop = Desktop.getDesktop();

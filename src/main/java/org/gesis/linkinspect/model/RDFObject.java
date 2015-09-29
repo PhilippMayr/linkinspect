@@ -1,26 +1,30 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.model;
 
 import org.openrdf.model.Value;
 
 /**
- *
- * @author bensmafx
+ * Represents an RDF object.
  */
 public class RDFObject extends PotentialURI{
     
     private String origin = null;
     
-    
+    /**
+     * ctor
+     * @param value
+     * @param origin 
+     */
     public RDFObject(Value value, String origin){
         this.value = value;
         this.origin = origin;
     }
 
+    /**
+     * Returns the direction of the link.
+     *
+     * @return True, if the link points from the given resource to another,
+     * false if the given resource is reference by an external resource.
+     */
     public String getOrigin() {
         return origin;
     }

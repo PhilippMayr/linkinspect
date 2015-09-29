@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.bl;
 
 import java.io.IOException;
@@ -41,7 +36,7 @@ public class Selector {
      * Selects n triples from a link file according to the given method.
      *
      * @param method Name of method to use
-     * @param file Link file
+     * @param linkFile link file
      * @param sampleCount Number of samples to select
      * @throws IOException
      * @throws RDFParseException
@@ -52,7 +47,7 @@ public class Selector {
         if (sampleCount > linkFile.getLinkCount()) {
             throw new Exception("Less triples available than requested.");
         }
-
+        //handles the "First N" algorithm
         if (method.equals(FIRST_N)) {
             LinkFileReader reader = new LinkFileReader(linkFile.getFile());
             reader.startReading();
@@ -67,7 +62,9 @@ public class Selector {
                 }
             }
             reader.close();
-        } else if (method.equals(ALGORITHM_R)) {
+        } 
+        //handles a reservoir sampling algorithm
+        else if (method.equals(ALGORITHM_R)) {
             int[] r = algorithmR(sampleCount, (int) linkFile.getLinkCount());
             LinkFileReader reader = new LinkFileReader(linkFile.getFile());
             reader.startReading();
@@ -93,6 +90,12 @@ public class Selector {
 
     private static Random ran = new Random(System.currentTimeMillis());
 
+    /**
+     * Implements a reservoir sampling.
+     * @param k
+     * @param n
+     * @return An array of index numbers
+     */
     private static int[] algorithmR(int k, int n) {
         
         int r[] = new int[k];

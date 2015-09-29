@@ -31,16 +31,23 @@ import org.gesis.linkinspect.model.Predicate;
 import org.gesis.linkinspect.model.ResourceProperty;
 
 /**
- *
- * @author bensmafx
+ * A tableview cell that displays RDF predicates
  */
 public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
 
+    //surrounding root container
     private VBox vb;
+    //the hyperlink displaying the predicate's URI
     private Hyperlink hyperlink = null;
+    //the current item 
     private Predicate currentItem = null;
+    //reference to a listener
     private OnPredicateClickListener listener = null;
 
+    /**
+     * ctor
+     * @param l 
+     */
     public PredicateCell(OnPredicateClickListener l) {
         listener = l;
         vb = new VBox();
@@ -50,6 +57,11 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
         setGraphic(vb);
     }
 
+    /**
+     * Update the graphic representation, is automaticall called by the tableview
+     * @param item
+     * @param empty 
+     */
     @Override
     public void updateItem(Predicate item, boolean empty) { //item ist das rechte
         if (item != null) {
@@ -77,6 +89,11 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
     }
     
     
+    /**
+     * Creates a context menu with a copy-to-clipboard item, and if desired an open-extern-item.
+     * @param withExtern
+     * @return 
+     */
     private ContextMenu prepareContextMenu(boolean withExtern) {
         ContextMenu menu = new ContextMenu();
         MenuItem itemCopyClipboard = new MenuItem("Copy to clipboard");

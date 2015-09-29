@@ -116,6 +116,11 @@ public class NewDialog extends Stage implements Initializable {
         btCancel.setCancelButton(true);
     }
 
+    /**
+     * Used for workoround on spinner; fixes missing auto-commit
+     * @param <T>
+     * @param spinner 
+     */
     private <T> void commitEditorText(Spinner<T> spinner) {
         if (!spinner.isEditable()) {
             return;

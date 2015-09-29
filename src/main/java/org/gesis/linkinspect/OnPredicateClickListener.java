@@ -8,8 +8,7 @@ package org.gesis.linkinspect;
 import org.gesis.linkinspect.model.Predicate;
 
 /**
- *
- * @author bensmafx
+ * A listener to stay informed on events on an RDF predicate
  */
 public interface OnPredicateClickListener {
     

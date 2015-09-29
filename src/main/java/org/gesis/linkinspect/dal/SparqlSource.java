@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.dal;
 
 import java.net.URL;
@@ -12,7 +7,6 @@ import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Value;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -110,6 +104,15 @@ public class SparqlSource {
     }
     
     
+    /**
+     * Determines whether a given resource is present in the given sparql store
+     * @param sparqlEp The sparql store to search in
+     * @param resource The resource to search
+     * @return true, if the resource was found
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException 
+     */
     public static boolean isPresent(String sparqlEp, String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
         Repository repo = new SPARQLRepository(sparqlEp);
         repo.initialize();

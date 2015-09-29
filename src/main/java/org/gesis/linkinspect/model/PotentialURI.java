@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.model;
 
 import org.openrdf.model.Literal;
@@ -10,8 +5,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
 /**
- *
- * @author bensmafx
+ * Represents a value that can possibly be interpreted as a URI.
  */
 public class PotentialURI {
     

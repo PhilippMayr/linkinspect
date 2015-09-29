@@ -23,16 +23,24 @@ import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 
 /**
- *
- * @author bensmafx
+ * A tableview cell that displays RDF objects
  */
 public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
 
+    //root container of the cell
     private VBox vb;
+    //the label/hyperlink
     private Labeled labeled = null;
+    //reference to the current rdf object
     private RDFObject currentItem = null;
+    //reference to a listener
     private OnObjectClickListener listener = null;
 
+    
+    /**
+     * ctor
+     * @param l 
+     */
     public ObjectCell(OnObjectClickListener l) {
         this.listener = l;
         vb = new VBox();
@@ -42,10 +50,16 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
         setGraphic(vb);
     }
 
+    /**
+     * Update the graphic representation, is automaticall called by the tableview
+     * @param item
+     * @param empty 
+     */
     @Override
     public void updateItem(RDFObject item, boolean empty) { //item ist das rechte
         if (item != null) {
             currentItem = item;
+            //in case the object is a resource
             if (item.isURI()) {
                 if (!(labeled instanceof Hyperlink)) {
                     vb.getChildren().remove(labeled);
@@ -66,7 +80,9 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
                     }
                 });
                 labeled.setContextMenu(prepareContextMenu(true));
-            } else {
+            }
+            //in case the object is a literal
+            else {
                 if (!(labeled instanceof Label)) {
                     vb.getChildren().remove(labeled);
                     labeled = new Label();
@@ -79,8 +95,15 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
         }
     }
 
+    
+    /**
+     * Creates a context menu with a copy-to-clipboard item, and if desired an open-extern-item.
+     * @param withExtern
+     * @return 
+     */
     private ContextMenu prepareContextMenu(boolean withExtern) {
         ContextMenu menu = new ContextMenu();
+        //copy to clipboard
         MenuItem itemCopyClipboard = new MenuItem("Copy to clipboard");
         itemCopyClipboard.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -93,6 +116,7 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
         });
         menu.getItems().add(itemCopyClipboard);
 
+        //open extern
         if (withExtern) {
             MenuItem itemOpenExtern = new MenuItem("Open extern");
             itemOpenExtern.setOnAction(new EventHandler<ActionEvent>() {

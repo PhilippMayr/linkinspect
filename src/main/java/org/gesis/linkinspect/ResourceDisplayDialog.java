@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect;
 
 import java.awt.Desktop;
@@ -71,12 +66,23 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
         // TODO
     }
     
+    /**
+     * Displays the given resource
+     * @param resource the resource
+     * @throws RepositoryException
+     * @throws MalformedQueryException
+     * @throws QueryEvaluationException 
+     */
     public void display(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
         this.resource = resource;
         rdCentralController.setTitle(this.resource);
         source.requestResource(this.resource);
     }
 
+    /**
+     * Reacts to a click in a predicate
+     * @param predicate 
+     */
     @Override
     public void onPredicateClick(Predicate predicate) {
         System.out.println("click on predicate "+predicate.getValue());
@@ -95,6 +101,10 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
     }
 
     
+    /**
+     * Reacts to a click on an rdf object
+     * @param object 
+     */
     @Override
     public void onObjectClick(RDFObject object) {
         System.out.println("click on object "+object.getValue());
@@ -117,6 +127,11 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
         }
     }
     
+    
+    /**
+     * Reacts to an "Open-extern"-request by opening the resource in the system web browser.
+     * @param object 
+     */
     @Override
     public void onOpenExternRequest(RDFObject object) {
         Desktop desktop = Desktop.getDesktop();
@@ -128,6 +143,10 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
         }
     }
     
+    /**
+     * Reacts to an "Open-extern"-request by opening the resource in the system web browser.
+     * @param predicate 
+     */
     @Override
     public void onOpenExternRequest(Predicate predicate) {
         Desktop desktop = Desktop.getDesktop();

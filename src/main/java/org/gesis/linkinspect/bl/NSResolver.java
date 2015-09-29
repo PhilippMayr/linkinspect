@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.bl;
 
 import java.io.BufferedReader;
@@ -16,8 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author bensmafx
+ * Manages a list with rdf namespaces and it shorts.
+ * Implements singleton
  */
 public class NSResolver {
 
@@ -31,6 +26,9 @@ public class NSResolver {
 
     private ArrayList<KVP> nsList = null;
 
+    /**
+     * private inner class to store the namespaces and its shorts.
+     */
     private class KVP {
 
         public String shortName = null;
@@ -43,6 +41,9 @@ public class NSResolver {
 
     }
 
+    /**
+     * Private ctor.
+     */
     private NSResolver() {
         nsList = new ArrayList<KVP>();
         nsList.add(new KVP(ABR_RDF, FULL_RDF));
@@ -68,6 +69,10 @@ public class NSResolver {
 
     }
 
+    /**
+     * Singleton
+     * @return 
+     */
     public static NSResolver getInstance() {
         if (instance == null) {
             instance = new NSResolver();
@@ -75,6 +80,11 @@ public class NSResolver {
         return instance;
     }
 
+    /**
+     * Determines whether a URL can be shortened with the data at hand.
+     * @param longName
+     * @return 
+     */
     public boolean canBeShoretened(String longName) {
         for (KVP kvp : nsList) {
             if (longName.startsWith(kvp.longName)) {
@@ -85,6 +95,11 @@ public class NSResolver {
     }
     
     
+    /**
+     * Actually shortens a URL with the data at hand.
+     * @param longName
+     * @return 
+     */
     public String shorten(String longName) {
         for (KVP kvp : nsList) {
             if (longName.startsWith(kvp.longName)) {

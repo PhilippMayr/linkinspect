@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect.dal;
 
 import java.io.File;
@@ -16,19 +11,30 @@ import org.gesis.linkinspect.model.SessionSettings;
 import org.gesis.linkinspect.model.Testset;
 
 /**
- *
- * @author bensmafx
+ * Writes reports about the current state of the testset.
  */
 public class ReportWriter {
 
     private Testset testSet = null;
     private SessionSettings settings = null;
 
+    
+    /**
+     * ctor
+     * @param testSet
+     * @param settings 
+     */
     public ReportWriter(Testset testSet, SessionSettings settings) {
         this.testSet = testSet;
         this.settings = settings;
     }
 
+    /**
+     * Writes a statistics report to the given file.
+     * @param file The given file
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     public void writeReport(File file) throws FileNotFoundException, IOException {
         PrintStream ps = new PrintStream(file);
         //calculate
@@ -58,6 +64,11 @@ public class ReportWriter {
 
     }
 
+    /**
+     * Writes a detailed CSV report about every sample to the given file.
+     * @param file The given file
+     * @throws FileNotFoundException 
+     */
     public void writeCSV(File file) throws FileNotFoundException {
         PrintStream ps = new PrintStream(file);
         String z = ";";

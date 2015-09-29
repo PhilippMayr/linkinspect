@@ -119,6 +119,10 @@ public class Testset extends ArrayList<Sample> {
     }
     
     
+    /**
+     * Returns the number of samples that are CORRECT, UNDECIDABLE or INCORRECT.
+     * @return 
+     */
     public int getEvaluated(){
         int cnt=0; 
         for (int i = 0; i < size(); i++) {

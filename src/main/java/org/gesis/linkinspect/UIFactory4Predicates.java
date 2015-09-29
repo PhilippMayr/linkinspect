@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect;
 
 import javafx.scene.control.TableCell;
@@ -13,17 +8,25 @@ import org.gesis.linkinspect.model.Predicate;
 import org.gesis.linkinspect.model.ResourceProperty;
 
 /**
- *
- * @author bensmafx
+ * Factory for the creation of cell-objects to populate a table view
  */
 public class UIFactory4Predicates implements Callback<TableColumn<ResourceProperty,Predicate>,TableCell<ResourceProperty,Predicate>> {
 
     private OnPredicateClickListener listener = null;
     
+    /**
+     * ctor
+     * @param l 
+     */
     public UIFactory4Predicates(OnPredicateClickListener l) {
         listener = l;
     }
 
+    /**
+     * Is called by the tableview in order to create a new cell
+     * @param param
+     * @return 
+     */
     @Override
     public TableCell<ResourceProperty, Predicate> call(TableColumn<ResourceProperty, Predicate> param) {
         return new PredicateCell(listener);
