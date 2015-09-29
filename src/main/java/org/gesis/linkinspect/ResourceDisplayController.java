@@ -34,6 +34,10 @@ public class ResourceDisplayController implements Initializable {
     //list to be mirrored by tvTable
     private ObservableList<ResourceProperty> data;
   
+    private OnPredicateClickListener onPredicateClickListener = null;
+    private OnObjectClickListener onObjectClickListener = null;
+    private UIFactory4Predicates predicateFactory = null;
+    private UIFactory4Objects objectFactory = null;
     
     /**
      * Initializes the controller class.
@@ -44,17 +48,20 @@ public class ResourceDisplayController implements Initializable {
         tvTable.setEditable(false);
         tvTable.getColumns().clear();
         
+        
         //create left column
         TableColumn<ResourceProperty,Predicate> predicateCol = new TableColumn<ResourceProperty,Predicate>("Predicate");
         predicateCol.setMinWidth(100);
         predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Predicate>("predicate"));
-        predicateCol.setCellFactory(new UIFactory4Predicates());
+        predicateFactory = new UIFactory4Predicates(onPredicateClickListener);
+        predicateCol.setCellFactory(predicateFactory);
     
         //create right column
         TableColumn<ResourceProperty,RDFObject> valueCol = new TableColumn<ResourceProperty,RDFObject>("Value");
         valueCol.setMinWidth(100);
         valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, RDFObject>("refValue"));
-        valueCol.setCellFactory(new UIFactory4Objects());
+        objectFactory = new UIFactory4Objects(onObjectClickListener);
+        valueCol.setCellFactory(objectFactory);
              
         
         //create list to be mirrored
@@ -79,5 +86,20 @@ public class ResourceDisplayController implements Initializable {
         //TODO support
     }
 
+    public void setOnPredicateClickListener(OnPredicateClickListener onPredicateClickListener) {
+        this.onPredicateClickListener = onPredicateClickListener;
+        predicateFactory.setListener(onPredicateClickListener);
+        
+    }
+    
+    public void setOnObjectClickListener(OnObjectClickListener onObjectClickListener){
+        this.onObjectClickListener = onObjectClickListener;
+        objectFactory.setListener(onObjectClickListener);
+    }
+
+    
+
+    
+    
     
 }

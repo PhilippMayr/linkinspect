@@ -34,6 +34,8 @@ import org.gesis.linkinspect.dal.PreferenceStorage;
 import org.gesis.linkinspect.dal.ReportWriter;
 import org.gesis.linkinspect.dal.SparqlSource;
 import org.gesis.linkinspect.model.LinkFile;
+import org.gesis.linkinspect.model.Predicate;
+import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 import org.gesis.linkinspect.model.Sample;
 import org.gesis.linkinspect.model.Sample.State;
@@ -46,7 +48,7 @@ import org.openrdf.repository.RepositoryException;
 /**
  * Controller class for the main screen - Scene.fxml
  */
-public class FXMLController implements Initializable {
+public class FXMLController implements Initializable, OnPredicateClickListener, OnObjectClickListener {
 
     //GUI controls in Scene.fxml
     //central pane
@@ -65,7 +67,7 @@ public class FXMLController implements Initializable {
 
     @FXML
     private Label lbLinkTypeValue;
-    
+
     @FXML
     private Label lbProgressValue;
 
@@ -100,10 +102,10 @@ public class FXMLController implements Initializable {
 
     @FXML
     private MenuItem miReport;
-    
+
     @FXML
     private Button btLog;
-    
+
     @FXML
     private MenuItem miLog;
 
@@ -190,23 +192,27 @@ public class FXMLController implements Initializable {
             settings.setSelectMethod(selectionMethod);
             settings.setSrcSparqlEp(source);
             settings.setTrtSparqlEp(target);
-            
+
             //save the settings to PreferenceStorage
             PreferenceStorage store = PreferenceStorage.getInstance();
             store.setSource(source);
             store.setTarget(target);
-            
+
             //create access objects to SPARQL endpoints and populate gui
             try {
                 Sample sample = testSet.getSample();
                 //for source
                 rdSourceController.reset();
+                rdSourceController.setOnPredicateClickListener(this);
+                rdSourceController.setOnObjectClickListener(this);
                 ObservableList<ResourceProperty> ol = rdSourceController.getObservableList();
                 src = new SparqlSource(new URL(source), ol);
                 rdSourceController.setTitle(sample.getLeftResource());
                 src.requestResource(sample.getLeftResource());
                 //for target
                 rdTargetController.reset();
+                rdTargetController.setOnPredicateClickListener(this);
+                rdTargetController.setOnObjectClickListener(this);
                 ObservableList<ResourceProperty> ol2 = rdTargetController.getObservableList();
                 tgt = new SparqlSource(new URL(target), ol2);
                 rdTargetController.setTitle(sample.getRightResource());
@@ -244,7 +250,7 @@ public class FXMLController implements Initializable {
             determineNavigationButtonStates();
             determineToggleButtonStates();
             updateProgress();
-            
+
             bpAll.getScene().setCursor(Cursor.DEFAULT);
             System.out.println("Everything went well.");
         }
@@ -477,9 +483,9 @@ public class FXMLController implements Initializable {
             return;
         }
         try {
-            ReportWriter reportWriter = new ReportWriter(testSet,settings);
+            ReportWriter reportWriter = new ReportWriter(testSet, settings);
             reportWriter.writeReport(file);
-            
+
             //open file in system editor...
             if (Desktop.isDesktopSupported()
                     && !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
@@ -499,9 +505,9 @@ public class FXMLController implements Initializable {
         }
 
     }
-    
+
     @FXML
-    private void writeLog(){
+    private void writeLog() {
         //show file save dialog
         FileChooser fileChooser = new FileChooser();
         File dir = new File(System.getProperty("user.home"));
@@ -512,10 +518,10 @@ public class FXMLController implements Initializable {
         if (file == null) {
             return;
         }
-        try{
-            ReportWriter reportWriter = new ReportWriter(testSet,settings);
+        try {
+            ReportWriter reportWriter = new ReportWriter(testSet, settings);
             reportWriter.writeCSV(file);
-        //open file in system editor...
+            //open file in system editor...
             if (Desktop.isDesktopSupported()
                     && !System.getProperty("os.name", "any other name").equals("Linux")) { //this does not work in ubuntu 14.04.1
                 Desktop dt = Desktop.getDesktop();
@@ -532,10 +538,8 @@ public class FXMLController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-    
+
     }
-    
 
     @FXML
     private void aboutMenuHandler(ActionEvent event) {
@@ -559,17 +563,55 @@ public class FXMLController implements Initializable {
             return;
         }
     }
-    
-    private void updateProgress(){
-        if(testSet != null){
+
+    private void updateProgress() {
+        if (testSet != null) {
             float g = testSet.size();
             float p = testSet.getEvaluated();
-            double p_percent = p/g*100f;
+            double p_percent = p / g * 100f;
             p_percent = Math.round(p_percent * 100.0) / 100.0;
-            lbProgressValue.setText(p_percent+"%");
-        }
-        else{
+            lbProgressValue.setText(p_percent + "%");
+        } else {
             lbProgressValue.setText("0.0%");
+        }
+    }
+
+    @Override
+    public void onPredicateClick(Predicate predicate) {
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            java.net.URI uri = java.net.URI.create(predicate.getValue());
+            try {
+                desktop.browse(uri);
+            } catch (IOException ex) {
+                Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (Exception ex) {
+            showError(ex.getMessage() + "\nPlease try again.");
+            System.err.println(ex);
+        }
+    }
+
+    @Override
+    public void onObjectClick(RDFObject object) {
+        try {
+
+            if (SparqlSource.isPresent(object.getOrigin(), object.getValue())) {
+                ResourceDisplayDialog browser = new ResourceDisplayDialog(object.getValue(), object.getOrigin());
+                browser.showAndWait();
+            } else {
+                Desktop desktop = Desktop.getDesktop();
+                java.net.URI uri = java.net.URI.create(object.getValue());
+                try {
+                    desktop.browse(uri);
+                } catch (IOException ex) {
+                    Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (Exception ex) {
+            showError(ex.getMessage() + "\nPlease try again.");
+            System.err.println(ex);
         }
     }
 

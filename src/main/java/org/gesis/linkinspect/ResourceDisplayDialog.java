@@ -5,19 +5,24 @@
  */
 package org.gesis.linkinspect;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.gesis.linkinspect.dal.SparqlSource;
+import org.gesis.linkinspect.model.Predicate;
+import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
@@ -26,7 +31,7 @@ import org.openrdf.repository.RepositoryException;
 /**
  * FXML Controller class
  */
-public class ResourceDisplayDialog extends Stage implements Initializable {
+public class ResourceDisplayDialog extends Stage implements Initializable, OnPredicateClickListener, OnObjectClickListener {
 
     @FXML
     private ResourceDisplayController rdCentralController;
@@ -50,6 +55,8 @@ public class ResourceDisplayDialog extends Stage implements Initializable {
         setTitle("Browser");
 
         rdCentralController.reset();
+        rdCentralController.setOnPredicateClickListener(this);
+        rdCentralController.setOnObjectClickListener(this);
         ObservableList<ResourceProperty> ol = rdCentralController.getObservableList();
         source = new SparqlSource(new URL(sparqlEp), ol);
         rdCentralController.setTitle(resource);
@@ -68,6 +75,60 @@ public class ResourceDisplayDialog extends Stage implements Initializable {
         this.resource = resource;
         rdCentralController.setTitle(this.resource);
         source.requestResource(this.resource);
+    }
+
+    @Override
+    public void onPredicateClick(Predicate predicate) {
+        System.out.println("click on predicate "+predicate.getValue());
+        try {
+            Desktop desktop = Desktop.getDesktop();
+            java.net.URI uri = java.net.URI.create(predicate.getValue());
+            try {
+                desktop.browse(uri);
+            } catch (IOException ex) {
+                Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (Exception ex) {
+            showError(ex.getMessage() + "\nPlease try again.");
+            System.err.println(ex);
+        } 
+    }
+
+    
+    @Override
+    public void onObjectClick(RDFObject object) {
+        System.out.println("click on object "+object.getValue());
+        try {
+
+            if (SparqlSource.isPresent(object.getOrigin(), object.getValue())) {
+                display(object.getValue());
+            } else {
+                Desktop desktop = Desktop.getDesktop();
+                java.net.URI uri = java.net.URI.create(object.getValue());
+                try {
+                    desktop.browse(uri);
+                } catch (IOException ex) {
+                    Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (Exception ex) {
+            showError(ex.getMessage() + "\nPlease try again.");
+            System.err.println(ex);
+        }
+    }
+    
+    
+    /**
+     * Shows an error dialog
+     *
+     * @param msg
+     */
+    private void showError(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Ooops, there was an error!");
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 
 }

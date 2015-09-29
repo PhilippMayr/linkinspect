@@ -34,8 +34,10 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
     private VBox vb;
     private Hyperlink hyperlink = null;
     private Predicate currentItem = null;
+    private OnPredicateClickListener listener = null;
 
-    public PredicateCell() {
+    public PredicateCell(OnPredicateClickListener l) {
+        listener = l;
         vb = new VBox();
         vb.setAlignment(Pos.CENTER_LEFT);
         hyperlink = new Hyperlink();
@@ -60,20 +62,9 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
                 @Override
                 public void handle(ActionEvent event) {
                     String str = currentItem.getValue();
-                    try {
-                        Desktop desktop = Desktop.getDesktop();
-                        java.net.URI uri = java.net.URI.create(str);
-                        try {
-                            desktop.browse(uri);
-                        } catch (IOException ex) {
-                            Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    } catch (Exception ex) {
-                        showError(ex.getMessage() + "\nPlease try again.");
-                        System.err.println(ex);
+                    if (listener != null) {
+                        listener.onPredicateClick(currentItem);
                     }
-
                 }
             });
         }

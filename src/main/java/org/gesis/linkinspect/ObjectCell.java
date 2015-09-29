@@ -32,8 +32,10 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
     private VBox vb;
     private Labeled labeled = null;
     private RDFObject currentItem = null;
+    private OnObjectClickListener listener = null;
 
-    public ObjectCell() {
+    public ObjectCell(OnObjectClickListener l) {
+        this.listener=l;
         vb = new VBox();
         vb.setAlignment(Pos.CENTER_LEFT);
         labeled = new Hyperlink();
@@ -59,24 +61,9 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
                     @Override
                     public void handle(ActionEvent event) {
                         String str = currentItem.getValue();
-                        try {
-                            if (SparqlSource.isPresent(currentItem.getOrigin(), currentItem.getValue())) {
-                                ResourceDisplayDialog browser = new ResourceDisplayDialog(currentItem.getValue(), currentItem.getOrigin());
-                                browser.showAndWait();
-                            } else {
-                                Desktop desktop = Desktop.getDesktop();
-                                java.net.URI uri = java.net.URI.create(str);
-                                try {
-                                    desktop.browse(uri);
-                                } catch (IOException ex) {
-                                    Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                            }
-                        } catch (Exception ex) {
-                            showError(ex.getMessage() + "\nPlease try again.");
-                            System.err.println(ex);
+                        if(listener != null){
+                            listener.onObjectClick(currentItem);
                         }
-
                     }
                 });
 
@@ -92,17 +79,6 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
         }
     }
 
-    /**
-     * Shows an error dialog
-     *
-     * @param msg
-     */
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Ooops, there was an error!");
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
+    
 
 }

@@ -17,14 +17,22 @@ import org.gesis.linkinspect.model.ResourceProperty;
  */
 public class UIFactory4Objects implements Callback<TableColumn<ResourceProperty,RDFObject>,TableCell<ResourceProperty,RDFObject>> {
 
-    public UIFactory4Objects() {
+    private OnObjectClickListener listener = null;
     
+    public UIFactory4Objects(OnObjectClickListener l) {
+        listener = l;
     }
 
     @Override
     public TableCell<ResourceProperty, RDFObject> call(TableColumn<ResourceProperty, RDFObject> param) {
-        return new ObjectCell();
+        return new ObjectCell(listener);
     }
+
+    public void setListener(OnObjectClickListener listener) {
+        this.listener = listener;
+    }
+    
+    
 
    
 

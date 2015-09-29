@@ -18,16 +18,20 @@ import org.gesis.linkinspect.model.ResourceProperty;
  */
 public class UIFactory4Predicates implements Callback<TableColumn<ResourceProperty,Predicate>,TableCell<ResourceProperty,Predicate>> {
 
-    public UIFactory4Predicates() {
+    private OnPredicateClickListener listener = null;
     
+    public UIFactory4Predicates(OnPredicateClickListener l) {
+        listener = l;
     }
 
     @Override
     public TableCell<ResourceProperty, Predicate> call(TableColumn<ResourceProperty, Predicate> param) {
-        return new PredicateCell();
+        return new PredicateCell(listener);
     }
 
-   
+   public void setListener(OnPredicateClickListener listener) {
+        this.listener = listener;
+    }
 
    
    
