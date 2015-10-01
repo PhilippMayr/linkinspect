@@ -16,9 +16,15 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import static javafx.scene.input.KeyCode.T;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
 
@@ -35,6 +41,8 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
     private RDFObject currentItem = null;
     //reference to a listener
     private OnObjectClickListener listener = null;
+    //
+    private Label lbPreview = null;
 
     
     /**
@@ -47,6 +55,11 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
         vb.setAlignment(Pos.CENTER_LEFT);
         labeled = new Hyperlink();
         vb.getChildren().add(labeled);
+        lbPreview = new Label();
+        lbPreview.setFont(new Font(10f));
+        lbPreview.setWrapText(false);
+        lbPreview.setTextOverrun(OverrunStyle.ELLIPSIS);
+        //vb.getChildren().add(lbPreview);
         setGraphic(vb);
     }
 
@@ -66,7 +79,11 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
                     labeled = new Hyperlink();
                     vb.getChildren().add(labeled);
                 }
+                if(!vb.getChildren().contains(lbPreview))
+                    vb.getChildren().add(lbPreview);
+                lbPreview.setText(item.getPreview());
                 labeled.setTooltip(new Tooltip(item.getValue()));
+                //labeled.setTooltip(new Tooltip(item.getPreview()));
                 Hyperlink hyperlink = (Hyperlink) labeled;
                 hyperlink.setText(item.getValue());
                 hyperlink.setOnAction(new EventHandler<ActionEvent>() {
@@ -90,6 +107,8 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
                 }
                 labeled.setText(item.getValue());
                 labeled.setContextMenu(prepareContextMenu(false));
+                if(vb.getChildren().contains(lbPreview))
+                    vb.getChildren().remove(lbPreview);
             }
             
         }
@@ -132,5 +151,24 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
         }
         return menu;
     }
+    
+    
+//    public static String refactorString(String str, int lines, int chars){
+//        if(str == null || str.equals(""))
+//            return "";
+//        if(str.length()<=chars)
+//            return str;
+//        else{
+//            String retVal = "";
+//            for(int i=0; i<lines; i++){
+//                retVal+=str.substring(i*chars,chars);
+//                if(i<lines-1){
+//                    retVal+="\n";
+//                }
+//            }
+//            return retVal;
+//        }
+//    }
+    
 
 }
