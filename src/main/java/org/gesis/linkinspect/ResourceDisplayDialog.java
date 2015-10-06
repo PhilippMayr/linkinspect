@@ -52,7 +52,7 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
         rdCentralController.reset();
         rdCentralController.setOnPredicateClickListener(this);
         rdCentralController.setOnObjectClickListener(this);
-        ObservableList<ResourceProperty> ol = rdCentralController.getObservableList();
+        ObservableList<Object> ol = rdCentralController.getObservableList();
         source = new SparqlSource(new URL(sparqlEp), ol);
         rdCentralController.setTitle(resource);
         source.requestResource(resource);

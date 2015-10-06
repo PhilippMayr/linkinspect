@@ -155,9 +155,9 @@ public class SparqlSource {
      */
     private void asyncRefine(ResourceProperty prop) {
         if (prop.getRefValue().isURI()) {
-//            Thread t = new Thread(new MyRunnable(prop));
-//            t.start();
-            Platform.runLater(new MyRunnable(prop));
+            Thread t = new Thread(new MyRunnable(prop));
+            t.start();
+            //Platform.runLater(new MyRunnable(prop));
         }
 
     }
@@ -176,7 +176,7 @@ public class SparqlSource {
                 Repository repo = new SPARQLRepository(endpoint.toString());
                 repo.initialize();
                 RepositoryConnection con = repo.getConnection();
-                String request = "SELECT ?p ?o WHERE { <" + prop.getRefValue().getValue() + "> ?p ?o }";
+                String request = "SELECT ?p ?o WHERE { <" + prop.getRefValue().getValue().trim() + "> ?p ?o }";
                 TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
                 query.setIncludeInferred(false);
                 TupleQueryResult result = query.evaluate();
@@ -189,9 +189,9 @@ public class SparqlSource {
                         if (predicate.stringValue().endsWith("title")
                                 || predicate.stringValue().endsWith("name")
                                 || predicate.stringValue().endsWith("label")) {
-                            preview = object.stringValue() + ";" + preview;
+                            preview = (object.stringValue() + ";" + preview);
                         } else {
-                            preview += object.stringValue() + ";";
+                            preview += (object.stringValue() + ";");
                         }
                     }
                 }

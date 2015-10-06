@@ -63,8 +63,13 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
      * @param empty 
      */
     @Override
-    public void updateItem(Predicate item, boolean empty) { //item ist das rechte
+    public void updateItem(Predicate item, boolean empty) { 
+        if(empty){
+            vb.setVisible(false);
+            return;
+        }
         if (item != null) {
+            vb.setVisible(true);
             currentItem = item;
             String text = null;
             if (item.isForward()) {

@@ -70,7 +70,13 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
      */
     @Override
     public void updateItem(RDFObject item, boolean empty) { //item ist das rechte
-        if (item != null) {
+        super.updateItem((RDFObject) item, empty);
+        if(empty){
+            vb.setVisible(false);
+            return;
+        }
+        if (item != null ) {
+            vb.setVisible(true);
             currentItem = item;
             //in case the object is a resource
             if (item.isURI()) {
@@ -81,7 +87,10 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
                 }
                 if(!vb.getChildren().contains(lbPreview))
                     vb.getChildren().add(lbPreview);
-                lbPreview.setText(item.getPreview());
+                if(item.getPreview()== null || item.getPreview().equals(""))
+                    lbPreview.setText("- no preview -");
+                else
+                    lbPreview.setText(item.getPreview());
                 labeled.setTooltip(new Tooltip(item.getValue()));
                 //labeled.setTooltip(new Tooltip(item.getPreview()));
                 Hyperlink hyperlink = (Hyperlink) labeled;

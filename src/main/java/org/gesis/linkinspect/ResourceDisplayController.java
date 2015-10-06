@@ -27,7 +27,7 @@ public class ResourceDisplayController implements Initializable {
     private TableView tvTable;
     
     //list to be mirrored by tvTable
-    private ObservableList<ResourceProperty> data;
+    private ObservableList<Object> data;
   
     private OnPredicateClickListener onPredicateClickListener = null;
     private OnObjectClickListener onObjectClickListener = null;
@@ -60,7 +60,7 @@ public class ResourceDisplayController implements Initializable {
              
         
         //create list to be mirrored
-        data = FXCollections.observableArrayList();
+        data = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
         
         //set list
         tvTable.setItems(data);
@@ -69,7 +69,7 @@ public class ResourceDisplayController implements Initializable {
     }
     
     
-    public ObservableList<ResourceProperty> getObservableList(){
+    public ObservableList<Object> getObservableList(){
         return data;
     }
     

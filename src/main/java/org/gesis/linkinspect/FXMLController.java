@@ -205,7 +205,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 rdSourceController.reset();
                 rdSourceController.setOnPredicateClickListener(this);
                 rdSourceController.setOnObjectClickListener(this);
-                ObservableList<ResourceProperty> ol = rdSourceController.getObservableList();
+                ObservableList<Object> ol = rdSourceController.getObservableList();
                 src = new SparqlSource(new URL(source), ol);
                 rdSourceController.setTitle(sample.getLeftResource());
                 src.requestResource(sample.getLeftResource());
@@ -213,7 +213,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 rdTargetController.reset();
                 rdTargetController.setOnPredicateClickListener(this);
                 rdTargetController.setOnObjectClickListener(this);
-                ObservableList<ResourceProperty> ol2 = rdTargetController.getObservableList();
+                ObservableList<Object> ol2 = rdTargetController.getObservableList();
                 tgt = new SparqlSource(new URL(target), ol2);
                 rdTargetController.setTitle(sample.getRightResource());
                 tgt.requestResource(sample.getRightResource());
