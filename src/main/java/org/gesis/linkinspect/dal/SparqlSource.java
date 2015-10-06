@@ -162,6 +162,12 @@ public class SparqlSource {
 
     }
 
+    
+    /**
+     * Class implements runnable interface to be started in a thread.
+     * The run()-method retrieves the resource description of a resource-object from a SPARQL endpoint
+     * and adds it to the object within a ResourceProperty and updates the list.
+     */
     private class MyRunnable implements Runnable {
 
         private ResourceProperty prop = null;
@@ -170,6 +176,7 @@ public class SparqlSource {
             this.prop = prop;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void run() {
             try {
