@@ -87,10 +87,14 @@ public class ObjectCell extends TableCell<ResourceProperty, RDFObject> {
                 }
                 if(!vb.getChildren().contains(lbPreview))
                     vb.getChildren().add(lbPreview);
-                if(item.getPreview()== null || item.getPreview().equals(""))
+                if(item.getPreview()== null || item.getPreview().equals("")){
                     lbPreview.setText("- no preview -");
-                else
+                    lbPreview.setTooltip(null);
+                }
+                else{
                     lbPreview.setText(item.getPreview());
+                    lbPreview.setTooltip(new Tooltip(item.getPreview()));
+                }
                 labeled.setTooltip(new Tooltip(item.getValue()));
                 //labeled.setTooltip(new Tooltip(item.getPreview()));
                 Hyperlink hyperlink = (Hyperlink) labeled;
