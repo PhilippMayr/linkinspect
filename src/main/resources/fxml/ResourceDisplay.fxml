@@ -9,7 +9,7 @@
 
 <TitledPane fx:id="tpTitle" text="Resource" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.gesis.linkinspect.ResourceDisplayController">
     <content>
-        <TableView fx:id="tvTable" prefHeight="200.0" prefWidth="400.0">
+        <TableView fx:id="tvTable" prefHeight="200.0" prefWidth="400.0" stylesheets="styles/resourcedisplay.css">
             <columns>
                 <TableColumn editable="false" prefWidth="75.0" text="Predicate" />
                 <TableColumn editable="false" prefWidth="75.0" text="Object" />
