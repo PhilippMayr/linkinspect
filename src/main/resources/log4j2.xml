@@ -2,11 +2,11 @@
 <Configuration package="log4j" status="info">
        <Appenders>
              <Console name="Console" target="SYSTEM_OUT">
-                    <PatternLayout pattern="%d{HH:mm:ss} %-5p (%F:%L) : %m  %n" />
+                    <PatternLayout pattern="%d{HH:mm:ss} %-5p [%-25t] (%F:%L) : %m  %n" />
              </Console>
              <File name="File" fileName="linkinspect.log" immediateFlush="true"
                     append="false">
-                    <PatternLayout pattern="%d{HH:mm:ss} %-5p (%F:%L) : %m  %n" />
+                    <PatternLayout pattern="%d{HH:mm:ss} %-5p [%-25t] (%F:%L) : %m  %n" />
              </File>
        </Appenders>
        <Loggers>

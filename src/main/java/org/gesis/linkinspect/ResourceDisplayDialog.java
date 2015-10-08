@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.dal.SparqlSource;
 import org.gesis.linkinspect.model.Predicate;
 import org.gesis.linkinspect.model.RDFObject;
@@ -35,11 +36,11 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
     private SparqlSource source = null;
 
     public ResourceDisplayDialog(String resource, String sparqlEp) throws MalformedURLException, RepositoryException, MalformedQueryException, QueryEvaluationException {
+        LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Opening browser for "+ resource+" in "+sparqlEp);
         this.resource = resource;
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/ResourceDisplayDialog.fxml"));
         fxmlLoader.setController(this);
 
-        // Nice to have this in a load() method instead of constructor, but this seems to be the convention.
         try {
             Scene scene = new Scene((Parent) fxmlLoader.load());
             setScene(scene);
@@ -74,6 +75,7 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
      * @throws QueryEvaluationException 
      */
     public void display(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException{
+        LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Displaying resource "+resource+".");
         this.resource = resource;
         rdCentralController.setTitle(this.resource);
         source.requestResource(this.resource);
@@ -85,18 +87,18 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
      */
     @Override
     public void onPredicateClick(Predicate predicate) {
-        System.out.println("click on predicate "+predicate.getValue());
+        LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "click on predicate "+predicate.getValue());
         try {
             Desktop desktop = Desktop.getDesktop();
             java.net.URI uri = java.net.URI.create(predicate.getValue());
             try {
                 desktop.browse(uri);
             } catch (IOException ex) {
-                Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, ex);
             }
         } catch (Exception ex) {
+            LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.WARN, "Request for predicate "+predicate.getValue()+" failed. "+ex);
             showError(ex.getMessage() + "\nPlease try again.");
-            System.err.println(ex);
         } 
     }
 
@@ -107,7 +109,7 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
      */
     @Override
     public void onObjectClick(RDFObject object) {
-        System.out.println("click on object "+object.getValue());
+        LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "click on object "+object.getValue()+" in "+object.getOrigin()+".");
         try {
 
             if (SparqlSource.isPresent(object.getOrigin(), object.getValue())) {
@@ -118,12 +120,12 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
                 try {
                     desktop.browse(uri);
                 } catch (IOException ex) {
-                    Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+                    LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.ERROR, "Openening resource in desktop web browser failed. "+ex);
                 }
             }
         } catch (Exception ex) {
+            LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.WARN, "Request for object "+object.getValue()+" in "+object.getOrigin()+" failed." +ex);
             showError(ex.getMessage() + "\nPlease try again.");
-            System.err.println(ex);
         }
     }
     
@@ -134,11 +136,13 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
      */
     @Override
     public void onOpenExternRequest(RDFObject object) {
+        LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Open extern request for object "+object.getValue());
         Desktop desktop = Desktop.getDesktop();
         java.net.URI uri = java.net.URI.create(object.getValue());
         try {
             desktop.browse(uri);
         } catch (IOException ex) {
+            LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             showError(ex.getMessage());
         }
     }
@@ -149,11 +153,13 @@ public class ResourceDisplayDialog extends Stage implements Initializable, OnPre
      */
     @Override
     public void onOpenExternRequest(Predicate predicate) {
+        LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Open extern request for predicate "+predicate.getValue());
         Desktop desktop = Desktop.getDesktop();
         java.net.URI uri = java.net.URI.create(predicate.getValue());
         try {
             desktop.browse(uri);
         } catch (IOException ex) {
+            LogManager.getLogger(ResourceDisplayDialog.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             showError(ex.getMessage());
         }
     }

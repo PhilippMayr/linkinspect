@@ -29,6 +29,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.bl.Selector;
 import org.gesis.linkinspect.dal.PreferenceStorage;
 import org.gesis.linkinspect.dal.ReportWriter;
@@ -123,21 +124,27 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
      */
     @FXML
     private void handleButtonAction(ActionEvent event) {
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "\"New\" button clicked.");
+
         //selector required for provision of selection methods
         Selector selector = new Selector();
 
         //shows a "New session" dialog
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Showing \"New\"-dialog.");
         NewDialog newDialog = new NewDialog(null, selector.getSelectionMethods());
         newDialog.showAndWait();
         boolean result = newDialog.isSuccessful();
         //check data
         if (result) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "In \"New\"-dialog \"Finish\"-button clicked.");
+
             //check link file
             bpAll.getScene().setCursor(Cursor.WAIT);
             LinkFile linkFile = newDialog.getLinkFile();
             //check selection method
             String selectionMethod = newDialog.getSelectionMethod();
             if (selectionMethod == null || selectionMethod.equals("")) {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Invalid selection method, aborting procedure.");
                 showError("Invalid selection method.");
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
@@ -145,42 +152,50 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             //check sample count
             int sampleCount = newDialog.getSampleCount();
             if (sampleCount <= 0 || sampleCount > linkFile.getLinkCount()) {
-                showError("Invalid sample count.");
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Invalid sample count: " + sampleCount + " , aborting procedure.");
+                showError("Invalid sample count: " + sampleCount);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             //check if source is set
             String source = newDialog.getSource();
             if (source == null || source.equals("")) {
-                showError("Invalid endpoint for source.");
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Invalid endpoint for source: " + source + ", aborting procedure.");
+                showError("Invalid endpoint for source: " + source);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             //check if source is connectable
             if (!SparqlSource.checkConnectivity(source)) {
-                showError("Unable to connect to source.");
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Unable to connect to source: " + source + ", aborting procedure.");
+                showError("Unable to connect to source: " + source);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             //check if target is set
             String target = newDialog.getTarget();
             if (target == null || target.equals("")) {
-                showError("Invalid endpoint for target.");
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Invalid endpoint for target: " + target + ", aborting procedure.");
+                showError("Invalid endpoint for target: " + target);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             //check if target is connectable
             if (!SparqlSource.checkConnectivity(target)) {
-                showError("Unable to connect to target.");
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Unable to connect to target: " + target + ", aborting procedure.");
+                showError("Unable to connect to target: " + target);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             //setup session
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Entering session setup.");
             //  select a set of samples
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Selecting samples.");
             try {
                 selector.selectFrom(selectionMethod, linkFile, sampleCount);
                 testSet = selector.generateTestSet();
             } catch (Exception ex) {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + " abroting setup.");
                 showExceptionDialog(ex);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
@@ -194,6 +209,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             settings.setTrtSparqlEp(target);
 
             //save the settings to PreferenceStorage
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Storing preferences.");
             PreferenceStorage store = PreferenceStorage.getInstance();
             store.setSource(source);
             store.setTarget(target);
@@ -202,6 +218,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             try {
                 Sample sample = testSet.getSample();
                 //for source
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setup ResourceDisplay and SPARQLSource for source.");
                 rdSourceController.reset();
                 rdSourceController.setOnPredicateClickListener(this);
                 rdSourceController.setOnObjectClickListener(this);
@@ -210,6 +227,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 rdSourceController.setTitle(sample.getLeftResource());
                 src.requestResource(sample.getLeftResource());
                 //for target
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setup ResourceDisplay and SPARQLSource for target.");
                 rdTargetController.reset();
                 rdTargetController.setOnPredicateClickListener(this);
                 rdTargetController.setOnObjectClickListener(this);
@@ -219,24 +237,29 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 tgt.requestResource(sample.getRightResource());
 
             } catch (MalformedURLException ex) {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + "Aborting setup");
                 showExceptionDialog(ex);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             } catch (RepositoryException ex) {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + "Aborting setup");
                 showExceptionDialog(ex);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             } catch (MalformedQueryException ex) {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + "Aborting setup");
                 showExceptionDialog(ex);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             } catch (QueryEvaluationException ex) {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + "Aborting setup");
                 showExceptionDialog(ex);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
 
             //fill out information labels
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setting label texts.");
             lbFileValue.setText(linkFile.getFile().getName());
             if (linkFile.getLinkType() != null) {
                 lbLinkTypeValue.setText(linkFile.getLinkType());
@@ -247,12 +270,13 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             lbTargetValue.setText(target);
 
             //determine button states
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Determining button states.");
             determineNavigationButtonStates();
             determineToggleButtonStates();
             updateProgress();
 
             bpAll.getScene().setCursor(Cursor.DEFAULT);
-            System.out.println("Everything went well.");
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Setting up session done.");
         }
     }
 
@@ -264,6 +288,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Initializing labels with \"not set\" text.");
         lbFileValue.setText("Not set");
         lbSourceValue.setText("Not set");
         lbTargetValue.setText("Not set");
@@ -331,19 +356,24 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
     private void handleNavigationButtonAction(ActionEvent event) {
         //if next, set position to next
         if (event.getSource() == btNext) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "\"Next\" button clicked.");
             testSet.goToNext();
         } //.. else set position to prev
         else {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "\"Preview\" button clicked.");
             testSet.goToPrevious();
         }
         try {
             //get sample at new position and display
             Sample s = testSet.getSample();
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Load left hand resource.");
             src.requestResource(s.getLeftResource());
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Load right hand resource.");
             tgt.requestResource(s.getRightResource());
             rdSourceController.setTitle(s.getLeftResource());
             rdTargetController.setTitle(s.getRightResource());
         } catch (Exception ex) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Exceptiond during resource loading: " + ex);
             showExceptionDialog(ex);
             System.exit(-1);
         }
@@ -472,6 +502,8 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
      */
     @FXML
     private void generateReport() {
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "\"Generate report\"-button clicked.");
+
         //show file save dialog
         FileChooser fileChooser = new FileChooser();
         File dir = new File(System.getProperty("user.home"));
@@ -480,6 +512,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt"));
         File file = fileChooser.showSaveDialog(null);
         if (file == null) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "No file chosen. Aborting procedure.");
             return;
         }
         try {
@@ -492,6 +525,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 Desktop dt = Desktop.getDesktop();
                 dt.open(file);
             } else {//...show just an info dialog
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.WARN, "Using desktop API is not feasable on this plattform.");
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success!");
                 alert.setHeaderText(null);
@@ -499,9 +533,9 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 alert.showAndWait();
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
         } catch (IOException ex) {
-            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
         }
 
     }
@@ -511,6 +545,8 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
      */
     @FXML
     private void writeLog() {
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "\"Generate log\"-button clicked.");
+
         //show file save dialog
         FileChooser fileChooser = new FileChooser();
         File dir = new File(System.getProperty("user.home"));
@@ -519,6 +555,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
         File file = fileChooser.showSaveDialog(null);
         if (file == null) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "No file chosen. Aborting procedure.");
             return;
         }
         try {
@@ -530,6 +567,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 Desktop dt = Desktop.getDesktop();
                 dt.open(file);
             } else {//...show just an info dialog
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.WARN, "Using desktop API is not feasable on this plattform.");
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Success!");
                 alert.setHeaderText(null);
@@ -537,17 +575,17 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 alert.showAndWait();
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
         } catch (IOException ex) {
-            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
         }
 
     }
 
-    
     /**
      * Reacts on the About-menu item
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void aboutMenuHandler(ActionEvent event) {
@@ -560,7 +598,8 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
 
     /**
      * Reacts on close events and shows an "Are you sure"-dialog.
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     public void exitHandler(ActionEvent event) {
@@ -570,8 +609,10 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         alert.setContentText("You are about to close this session. Proceed?");
         Optional<ButtonType> result = alert.showAndWait();
         if (result.get() == ButtonType.OK) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Shutting down with value 0.");
             System.exit(0);
         } else {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Shuttung down aborted.");
             return;
         }
     }
@@ -593,36 +634,40 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
 
     /**
      * Reacts to click on a predicate
-     * @param predicate 
+     *
+     * @param predicate
      */
     @Override
     public void onPredicateClick(Predicate predicate) {
         try {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Predicate clicked. Open link in plattform web browser: "+predicate.getValue());
             Desktop desktop = Desktop.getDesktop();
             java.net.URI uri = java.net.URI.create(predicate.getValue());
             try {
                 desktop.browse(uri);
             } catch (IOException ex) {
-                Logger.getLogger(ResourceProperty.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             }
-
         } catch (Exception ex) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             showError(ex.getMessage() + "\nPlease try again.");
-            System.err.println(ex);
         }
     }
 
     /**
      * Reacts to click on an object
-     * @param object 
+     *
+     * @param object
      */
     @Override
     public void onObjectClick(RDFObject object) {
         try {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Object clicked. Open link in linkinspect browser. Link: "+object.getValue()+", Origin: "+object.getOrigin());
             if (SparqlSource.isPresent(object.getOrigin(), object.getValue())) {
                 ResourceDisplayDialog browser = new ResourceDisplayDialog(object.getValue(), object.getOrigin());
                 browser.showAndWait();
             } else {
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Resource: "+object.getValue()+" was not available in triplestore: "+object.getOrigin());
                 showError("This resource is not available in the triplestore.");
             }
         } catch (Exception ex) {
@@ -631,33 +676,40 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         }
     }
 
-    
     /**
-     * Reacts to open-extern-requests by trying to open the system web browser with the given object.
-     * @param object 
+     * Reacts to open-extern-requests by trying to open the system web browser
+     * with the given object.
+     *
+     * @param object
      */
     @Override
     public void onOpenExternRequest(RDFObject object) {
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Opening object extern.");
         Desktop desktop = Desktop.getDesktop();
         java.net.URI uri = java.net.URI.create(object.getValue());
         try {
             desktop.browse(uri);
         } catch (IOException ex) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             showExceptionDialog(ex);
         }
     }
 
     /**
-     * Reacts to open-extern-requests by trying to open the system web browser with the given object.
-     * @param predicate 
+     * Reacts to open-extern-requests by trying to open the system web browser
+     * with the given object.
+     *
+     * @param predicate
      */
     @Override
     public void onOpenExternRequest(Predicate predicate) {
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Opening predicate extern.");
         Desktop desktop = Desktop.getDesktop();
         java.net.URI uri = java.net.URI.create(predicate.getValue());
         try {
             desktop.browse(uri);
         } catch (IOException ex) {
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             showExceptionDialog(ex);
         }
     }

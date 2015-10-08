@@ -2,6 +2,8 @@ package org.gesis.linkinspect.bl;
 
 import java.io.File;
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.gesis.linkinspect.ResourceDisplayDialog;
 import org.gesis.linkinspect.dal.LinkFileReader;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
@@ -34,18 +36,19 @@ public class LinkFileChecker {
      * @return
      */
     public boolean checkLinkFile(File file) {
+        LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.DEBUG, "Checking file "+file.getAbsolutePath());
         linkCount = 0;
         LinkFileReader reader = new LinkFileReader(file);
         try {
             reader.startReading();
         } catch (IOException ex) {
-            System.err.println(ex);
+            LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             return false;
         } catch (RDFParseException ex) {
-            System.err.println(ex);
+            LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             return false;
         } catch (RDFHandlerException ex) {
-            System.err.println(ex);
+            LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             return false;
         }
 
@@ -61,17 +64,17 @@ public class LinkFileChecker {
                 linkType = first.getPredicate().stringValue();
             }
             if (!st.getPredicate().equals(first.getPredicate())) {
-                System.err.println("Link types are not homogen.");
+                LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.ERROR, "Link types are not homogen.");
                 reader.close();
                 return false;
             }
             if (!(st.getObject() instanceof URI)) {
-                System.err.println("Object is not a URI.");
+                LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.ERROR, "Object is not a URI.");   
                 reader.close();
                 return false;
             }
             if (st.getSubject().stringValue().equals(st.getObject().stringValue())) {
-                System.err.println("Self-link found.");
+                LogManager.getLogger(LinkFileChecker.class).log(org.apache.logging.log4j.Level.ERROR, "Self-link found.");   
                 reader.close();
                 return false;
             }

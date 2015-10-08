@@ -25,6 +25,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.bl.LinkFileChecker;
 import org.gesis.linkinspect.dal.PreferenceStorage;
 import org.gesis.linkinspect.model.LinkFile;
@@ -75,7 +76,8 @@ public class NewDialog extends Stage implements Initializable {
      */
     @SuppressWarnings("unchecked")
     public NewDialog(Parent parent, String[] selectionMethods) {
-
+        LogManager.getLogger(NewDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Preparing \"New\"-dialog.");
+        
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/NewDialog.fxml"));
         fxmlLoader.setController(this);
 
@@ -152,6 +154,8 @@ public class NewDialog extends Stage implements Initializable {
     @FXML
     @SuppressWarnings("unchecked")
     private void handleButtonAction(ActionEvent event) {
+        LogManager.getLogger(NewDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Browse button clicked.");
+        
         //if browse button, select a file
         if (event.getSource() == btBrowse) {
             FileChooser fileChooser = new FileChooser();
@@ -174,13 +178,15 @@ public class NewDialog extends Stage implements Initializable {
             LinkFileChecker lfChecker = new LinkFileChecker();
             boolean fileOk = lfChecker.checkLinkFile(file);
             if (!fileOk) {
-                showError("Error when reading file.");
+                LogManager.getLogger(NewDialog.class).log(org.apache.logging.log4j.Level.ERROR, "Error when reading link file.");
+                showError("Error when reading link file.");
                 vbFrame.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
             long linkCount = lfChecker.getLinkCount();
             if (linkCount < 1) {
-                showError("Error too less entries found in file. Found " + linkCount);
+                LogManager.getLogger(NewDialog.class).log(org.apache.logging.log4j.Level.ERROR, "Error too less entries found in file. Found " + linkCount);
+                showError("Too less entries found in file. Found " + linkCount);
                 vbFrame.getScene().setCursor(Cursor.DEFAULT);
                 return;
             }
@@ -225,8 +231,10 @@ public class NewDialog extends Stage implements Initializable {
     public int getSampleCount() {
         Object o = spSamples.getValue();
         if (o instanceof Integer) { //for windows
+            LogManager.getLogger(NewDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Sample count retrieved from spinner as integer.");
             return (int) o;
         } else if (o instanceof Double) { //for ubuntu
+            LogManager.getLogger(NewDialog.class).log(org.apache.logging.log4j.Level.DEBUG, "Sample count retrieved from spinner as double.");
             return (int) (double) o;
         }
         return -1;

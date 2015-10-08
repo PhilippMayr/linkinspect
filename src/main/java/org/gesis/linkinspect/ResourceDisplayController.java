@@ -10,7 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.gesis.linkinspect.model.PotentialURI;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.model.Predicate;
 import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
@@ -45,6 +45,7 @@ public class ResourceDisplayController implements Initializable {
         
         
         //create left column
+        LogManager.getLogger(ResourceDisplayController.class).log(org.apache.logging.log4j.Level.DEBUG, "Configuring left hand column.");
         TableColumn<ResourceProperty,Predicate> predicateCol = new TableColumn<ResourceProperty,Predicate>("Predicate");
         predicateCol.setMinWidth(100);
         predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Predicate>("predicate"));
@@ -52,6 +53,7 @@ public class ResourceDisplayController implements Initializable {
         predicateCol.setCellFactory(predicateFactory);
     
         //create right column
+        LogManager.getLogger(ResourceDisplayController.class).log(org.apache.logging.log4j.Level.DEBUG, "Configuring right hand column.");
         TableColumn<ResourceProperty,RDFObject> valueCol = new TableColumn<ResourceProperty,RDFObject>("Value");
         valueCol.setMinWidth(100);
         valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, RDFObject>("refValue"));
@@ -60,6 +62,7 @@ public class ResourceDisplayController implements Initializable {
              
         
         //create list to be mirrored
+        LogManager.getLogger(ResourceDisplayController.class).log(org.apache.logging.log4j.Level.DEBUG, "Adding data.");
         data = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
         
         //set list

@@ -6,9 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Manages a list with rdf namespaces and it shorts.
@@ -27,7 +27,7 @@ public class NSResolver {
     private ArrayList<KVP> nsList = null;
 
     /**
-     * private inner class to store the namespaces and its shorts.
+     * Private inner class to store the namespaces and its shorts.
      */
     private class KVP {
 
@@ -51,6 +51,7 @@ public class NSResolver {
 
         File file = new File(FILEPATH);
         if (file.exists() && file.isFile()) {
+            LogManager.getLogger(NSResolver.class).log(org.apache.logging.log4j.Level.INFO, "Namespace file was found.");   
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 String line = reader.readLine();
@@ -61,10 +62,13 @@ public class NSResolver {
                 }
                 reader.close();
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(NSResolver.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(NSResolver.class).log(org.apache.logging.log4j.Level.ERROR, ex);   
             } catch (IOException ex) {
-                Logger.getLogger(NSResolver.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(NSResolver.class).log(org.apache.logging.log4j.Level.ERROR, ex);  
             }
+        }
+        else{
+            LogManager.getLogger(NSResolver.class).log(org.apache.logging.log4j.Level.INFO, "Namespace file was not found.");   
         }
 
     }
@@ -85,7 +89,7 @@ public class NSResolver {
      * @param longName
      * @return 
      */
-    public boolean canBeShoretened(String longName) {
+    public boolean canBeShortened(String longName) {
         for (KVP kvp : nsList) {
             if (longName.startsWith(kvp.longName)) {
                 return true;

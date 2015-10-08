@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.dal.LinkFileReader;
 import org.gesis.linkinspect.model.LinkFile;
 import org.gesis.linkinspect.model.Sample;
@@ -26,6 +27,7 @@ public class Selector {
     public Selector() {
         selectionMethods = new String[]{FIRST_N, ALGORITHM_R};
         selection = new ArrayList<Statement>();
+        LogManager.getLogger(Selector.class).log(org.apache.logging.log4j.Level.DEBUG, selectionMethods.length +" selection methods present.");  
     }
 
     public String[] getSelectionMethods() {
@@ -45,10 +47,12 @@ public class Selector {
      */
     public void selectFrom(String method, LinkFile linkFile, int sampleCount) throws IOException, RDFParseException, RDFHandlerException, Exception {
         if (sampleCount > linkFile.getLinkCount()) {
+            LogManager.getLogger(Selector.class).log(org.apache.logging.log4j.Level.ERROR, "Less triples available than requested.");  
             throw new Exception("Less triples available than requested.");
         }
         //handles the "First N" algorithm
         if (method.equals(FIRST_N)) {
+            LogManager.getLogger(Selector.class).log(org.apache.logging.log4j.Level.DEBUG, "Using \"First n\" algorithm.");  
             LinkFileReader reader = new LinkFileReader(linkFile.getFile());
             reader.startReading();
             selection.clear();
@@ -65,6 +69,7 @@ public class Selector {
         } 
         //handles a reservoir sampling algorithm
         else if (method.equals(ALGORITHM_R)) {
+            LogManager.getLogger(Selector.class).log(org.apache.logging.log4j.Level.DEBUG, "Using \"Algorithm R\" algorithm.");  
             int[] r = algorithmR(sampleCount, (int) linkFile.getLinkCount());
             LinkFileReader reader = new LinkFileReader(linkFile.getFile());
             reader.startReading();
@@ -123,6 +128,7 @@ public class Selector {
      */
     public Testset generateTestSet() throws IllegalStateException {
         if (selection.isEmpty()) {
+            LogManager.getLogger(Selector.class).log(org.apache.logging.log4j.Level.ERROR, "A selection has not been done.");  
             throw new IllegalStateException("A selection has not been done.");
         }
         Testset set = new Testset();

@@ -5,6 +5,7 @@ import java.util.prefs.Preferences;
 /**
  * Class to manage access to system preferences.
  * Is used to store short recurrent information.
+ * Implements singleton.
  */
 public class PreferenceStorage {
 

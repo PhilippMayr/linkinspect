@@ -1,32 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.gesis.linkinspect;
 
-import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.bl.NSResolver;
-import org.gesis.linkinspect.dal.SparqlSource;
-import org.gesis.linkinspect.model.PotentialURI;
 import org.gesis.linkinspect.model.Predicate;
 import org.gesis.linkinspect.model.ResourceProperty;
 
@@ -46,7 +34,8 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
 
     /**
      * ctor
-     * @param l 
+     *
+     * @param l
      */
     public PredicateCell(OnPredicateClickListener l) {
         listener = l;
@@ -58,13 +47,15 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
     }
 
     /**
-     * Update the graphic representation, is automaticall called by the tableview
+     * Update the graphic representation, is automaticall called by the
+     * tableview
+     *
      * @param item
-     * @param empty 
+     * @param empty
      */
     @Override
-    public void updateItem(Predicate item, boolean empty) { 
-        if(empty){
+    public void updateItem(Predicate item, boolean empty) {
+        if (empty) {
             vb.setVisible(false);
             return;
         }
@@ -92,12 +83,13 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
             hyperlink.setContextMenu(prepareContextMenu(true));
         }
     }
-    
-    
+
     /**
-     * Creates a context menu with a copy-to-clipboard item, and if desired an open-extern-item.
+     * Creates a context menu with a copy-to-clipboard item, and if desired an
+     * open-extern-item.
+     *
      * @param withExtern
-     * @return 
+     * @return
      */
     private ContextMenu prepareContextMenu(boolean withExtern) {
         ContextMenu menu = new ContextMenu();
@@ -119,8 +111,9 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
 
                 @Override
                 public void handle(ActionEvent event) {
-                    if(listener != null){
-                    listener.onOpenExternRequest(currentItem);
+                    if (listener != null) {
+                        LogManager.getLogger(PredicateCell.class).log(org.apache.logging.log4j.Level.DEBUG, "Fire \"open extern\" event.");
+                        listener.onOpenExternRequest(currentItem);
                     }
                 }
             });
@@ -128,20 +121,6 @@ public class PredicateCell extends TableCell<ResourceProperty, Predicate> {
         }
         return menu;
     }
-    
-    
 
-    /**
-     * Shows an error dialog
-     *
-     * @param msg
-     */
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Ooops, there was an error!");
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
 
 }

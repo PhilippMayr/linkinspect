@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.gesis.linkinspect.bl.Selector;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandlerException;
@@ -77,7 +79,7 @@ public class LinkFileReader {
             if(fis != null)
                 fis.close();
         } catch (IOException ex) {
-            Logger.getLogger(LinkFileReader.class.getName()).log(Level.SEVERE, null, ex);
+            LogManager.getLogger(LinkFileReader.class).log(org.apache.logging.log4j.Level.ERROR, ex);  
         }
     }
         

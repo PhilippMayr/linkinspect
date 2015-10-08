@@ -1,11 +1,10 @@
 package org.gesis.linkinspect.dal;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.model.Predicate;
 import org.gesis.linkinspect.model.RDFObject;
 import org.gesis.linkinspect.model.ResourceProperty;
@@ -47,8 +46,10 @@ public class SparqlSource {
      */
     @SuppressWarnings("unchecked")
     public void requestResource(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Request for resource "+resource+" in "+endpoint);
         observableList.clear();
-
+        
+        try{
         Repository repo = new SPARQLRepository(endpoint.toString());
         repo.initialize();
         RepositoryConnection con = repo.getConnection();
@@ -68,6 +69,18 @@ public class SparqlSource {
         addInverse(resource);
         result.close();
         con.close();
+        }catch(RepositoryException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
+        catch(MalformedQueryException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
+        catch(QueryEvaluationException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
     }
 
     /**
@@ -78,6 +91,9 @@ public class SparqlSource {
      */
     @SuppressWarnings("unchecked")
     public void addInverse(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Request for links to resource "+resource+" in "+endpoint);
+        
+        try{
         Repository repo = new SPARQLRepository(endpoint.toString());
         repo.initialize();
         RepositoryConnection con = repo.getConnection();
@@ -96,6 +112,18 @@ public class SparqlSource {
         }
         result.close();
         con.close();
+        }catch(RepositoryException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
+        catch(MalformedQueryException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
+        catch(QueryEvaluationException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
     }
 
     /**
@@ -111,6 +139,7 @@ public class SparqlSource {
             RepositoryConnection con = repo.getConnection();
             con.close();
         } catch (OpenRDFException e) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "No connectivity to "+sparqlEp);
             return false;
         }
         return true;
@@ -127,6 +156,9 @@ public class SparqlSource {
      * @throws QueryEvaluationException
      */
     public static boolean isPresent(String sparqlEp, String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Check if present. Resource: "+resource+" SPARQL ep: "+sparqlEp);
+        
+        try{
         Repository repo = new SPARQLRepository(sparqlEp);
         repo.initialize();
         RepositoryConnection con = repo.getConnection();
@@ -144,6 +176,18 @@ public class SparqlSource {
         result.close();
         con.close();
         return retVal;
+        }catch(RepositoryException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
+        catch(MalformedQueryException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
+        catch(QueryEvaluationException ex){
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+            throw ex;
+        }
     }
 
     /**
@@ -179,6 +223,7 @@ public class SparqlSource {
         @SuppressWarnings("unchecked")
         @Override
         public void run() {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Asynchronous request to "+prop.getRefValue().getValue()+" in "+prop.getRefValue().getOrigin());
             try {
                 Repository repo = new SPARQLRepository(endpoint.toString());
                 repo.initialize();
@@ -209,11 +254,11 @@ public class SparqlSource {
                 observableList.add(null);
                 observableList.remove(null);
             } catch (RepositoryException ex) {
-                Logger.getLogger(SparqlSource.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             } catch (MalformedQueryException ex) {
-                Logger.getLogger(SparqlSource.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             } catch (QueryEvaluationException ex) {
-                Logger.getLogger(SparqlSource.class.getName()).log(Level.SEVERE, null, ex);
+                LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             }
         }
 
