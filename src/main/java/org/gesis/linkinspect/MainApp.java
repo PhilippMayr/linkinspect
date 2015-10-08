@@ -11,6 +11,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Start class for this application
@@ -25,6 +27,8 @@ public class MainApp extends Application {
      */
     @Override
     public void start(Stage stage) throws Exception {
+        LogManager.getLogger(MainApp.class).log(Level.INFO, "Entering application.");
+
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
 
         Scene scene = new Scene(root);
@@ -44,15 +48,17 @@ public class MainApp extends Application {
                 alert.setContentText("You are about to close this session. Proceed?");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK) {
+                    LogManager.getLogger(MainApp.class).log(Level.INFO, "Shutting down with value 0.");
                     System.exit(0);
                 } else {
                     we.consume();
+                    LogManager.getLogger(MainApp.class).log(Level.INFO, "Shutting down aborted.");
                 }
             }
         });
 
         stage.show();
-
+        LogManager.getLogger(MainApp.class).log(Level.DEBUG, "Showing main window.");
     }
 
     /**
@@ -64,6 +70,7 @@ public class MainApp extends Application {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        LogManager.getLogger(MainApp.class).log(Level.INFO, "Entering application via main.");
         launch(args);
     }
 
