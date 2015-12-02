@@ -275,6 +275,12 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             determineToggleButtonStates();
             updateProgress();
 
+            //schedule delayed refresh for tableView
+            rdSourceController.invokeDelayedRefresh(3000);
+            rdSourceController.invokeDelayedRefresh(6000);
+            rdTargetController.invokeDelayedRefresh(3000);
+            rdTargetController.invokeDelayedRefresh(6000);
+            
             bpAll.getScene().setCursor(Cursor.DEFAULT);
             LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Setting up session done.");
         }
@@ -372,6 +378,10 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             tgt.requestResource(s.getRightResource());
             rdSourceController.setTitle(s.getLeftResource());
             rdTargetController.setTitle(s.getRightResource());
+            rdSourceController.invokeDelayedRefresh(3000);
+            rdSourceController.invokeDelayedRefresh(6000);
+            rdTargetController.invokeDelayedRefresh(3000);
+            rdTargetController.invokeDelayedRefresh(6000);
         } catch (Exception ex) {
             LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Exceptiond during resource loading: " + ex);
             showExceptionDialog(ex);

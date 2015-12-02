@@ -2,6 +2,9 @@ package org.gesis.linkinspect;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -22,18 +25,18 @@ public class ResourceDisplayController implements Initializable {
 
     @FXML
     private TitledPane tpTitle;
-    
+
     @FXML
     private TableView tvTable;
-    
+
     //list to be mirrored by tvTable
     private ObservableList<Object> data;
-  
+
     private OnPredicateClickListener onPredicateClickListener = null;
     private OnObjectClickListener onObjectClickListener = null;
     private UIFactory4Predicates predicateFactory = null;
     private UIFactory4Objects objectFactory = null;
-    
+
     /**
      * Initializes the controller class.
      */
@@ -42,41 +45,38 @@ public class ResourceDisplayController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         tvTable.setEditable(false);
         tvTable.getColumns().clear();
-        
-        
+
         //create left column
         LogManager.getLogger(ResourceDisplayController.class).log(org.apache.logging.log4j.Level.DEBUG, "Configuring left hand column.");
-        TableColumn<ResourceProperty,Predicate> predicateCol = new TableColumn<ResourceProperty,Predicate>("Predicate");
+        TableColumn<ResourceProperty, Predicate> predicateCol = new TableColumn<ResourceProperty, Predicate>("Predicate");
         predicateCol.setMinWidth(100);
-        predicateCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, Predicate>("predicate"));
+        predicateCol.setCellValueFactory(new PropertyValueFactory<ResourceProperty, Predicate>("predicate"));
         predicateFactory = new UIFactory4Predicates(onPredicateClickListener);
         predicateCol.setCellFactory(predicateFactory);
-    
+
         //create right column
         LogManager.getLogger(ResourceDisplayController.class).log(org.apache.logging.log4j.Level.DEBUG, "Configuring right hand column.");
-        TableColumn<ResourceProperty,RDFObject> valueCol = new TableColumn<ResourceProperty,RDFObject>("Value");
+        TableColumn<ResourceProperty, RDFObject> valueCol = new TableColumn<ResourceProperty, RDFObject>("Value");
         valueCol.setMinWidth(100);
-        valueCol.setCellValueFactory( new PropertyValueFactory<ResourceProperty, RDFObject>("refValue"));
+        valueCol.setCellValueFactory(new PropertyValueFactory<ResourceProperty, RDFObject>("refValue"));
         objectFactory = new UIFactory4Objects(onObjectClickListener);
         valueCol.setCellFactory(objectFactory);
-             
-        
+
         //create list to be mirrored
         LogManager.getLogger(ResourceDisplayController.class).log(org.apache.logging.log4j.Level.DEBUG, "Adding data.");
         data = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
-        
+
         //set list
         tvTable.setItems(data);
         //add columns
         tvTable.getColumns().addAll(predicateCol, valueCol);
     }
-    
-    
-    public ObservableList<Object> getObservableList(){
+
+    public ObservableList<Object> getObservableList() {
         return data;
     }
-    
-    public void setTitle(String title){
+
+    public void setTitle(String title) {
         tpTitle.setText(title);
     }
 
@@ -87,17 +87,38 @@ public class ResourceDisplayController implements Initializable {
     public void setOnPredicateClickListener(OnPredicateClickListener onPredicateClickListener) {
         this.onPredicateClickListener = onPredicateClickListener;
         predicateFactory.setListener(onPredicateClickListener);
-        
+
     }
-    
-    public void setOnObjectClickListener(OnObjectClickListener onObjectClickListener){
+
+    public void setOnObjectClickListener(OnObjectClickListener onObjectClickListener) {
         this.onObjectClickListener = onObjectClickListener;
         objectFactory.setListener(onObjectClickListener);
     }
 
-    
+    /**
+     * Invokes a delayed refresh on the table view
+     *
+     * @param millis Milliseconds to wait
+     */
+    @SuppressWarnings("unchecked")
+    public void invokeDelayedRefresh(final int millis) {
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                TableColumn<Object, Object> col = (TableColumn<Object, Object>) tvTable.getColumns().get(0);
+                                col.setVisible(false);
+                                col.setVisible(true);
+                            }
+                        });
+                    }
+                },
+                millis
+        );
 
-    
-    
-    
+    }
+
 }
