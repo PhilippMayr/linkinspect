@@ -1,8 +1,6 @@
 package org.gesis.linkinspect.dal;
 
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.gesis.linkinspect.model.Predicate;
@@ -17,6 +15,7 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
+import org.openrdf.query.resultio.QueryResultParseException;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -46,39 +45,39 @@ public class SparqlSource {
      */
     @SuppressWarnings("unchecked")
     public void requestResource(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Request for resource "+resource+" in "+endpoint);
+        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Request for resource " + resource + " in " + endpoint);
         observableList.clear();
-        
-        try{
-        Repository repo = new SPARQLRepository(endpoint.toString());
-        repo.initialize();
-        RepositoryConnection con = repo.getConnection();
-        String request = "SELECT ?p ?o WHERE { <" + resource + "> ?p ?o }";
-        TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
-        query.setIncludeInferred(false);
-        TupleQueryResult result = query.evaluate();
-        while (result.hasNext()) {
-            BindingSet bindingSet = result.next();
-            Value predicate = bindingSet.getValue("p");
-            Value object = bindingSet.getValue("o");
-            RDFObject rdfObj = new RDFObject(object, endpoint.toString());
-            ResourceProperty rp = new ResourceProperty(new Predicate(predicate, true), rdfObj);
-            observableList.add(rp);
-            asyncRefine(rp);
-        }
-        addInverse(resource);
-        result.close();
-        con.close();
-        }catch(RepositoryException ex){
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+
+        try {
+            Repository repo = new SPARQLRepository(endpoint.toString());
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            String request = "SELECT ?p ?o WHERE { <" + resource + "> ?p ?o }";
+            TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
+            query.setIncludeInferred(false);
+            TupleQueryResult result = query.evaluate();
+            while (result.hasNext()) {
+                BindingSet bindingSet = result.next();
+                Value predicate = bindingSet.getValue("p");
+                Value object = bindingSet.getValue("o");
+                RDFObject rdfObj = new RDFObject(object, endpoint.toString());
+                ResourceProperty rp = new ResourceProperty(new Predicate(predicate, true), rdfObj);
+                observableList.add(rp);
+                asyncRefine(rp);
+            }
+            addInverse(resource);
+            result.close();
+            con.close();
+        } catch (RepositoryException ex) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, "On query to " + resource, ex);
             throw ex;
-        }
-        catch(MalformedQueryException ex){
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+        } catch (MalformedQueryException ex) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, "On query to " + resource, ex);
             throw ex;
-        }
-        catch(QueryEvaluationException ex){
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+        } catch (QueryEvaluationException ex) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, "On query to " + resource, ex);
+            
+            
             throw ex;
         }
     }
@@ -91,37 +90,35 @@ public class SparqlSource {
      */
     @SuppressWarnings("unchecked")
     public void addInverse(String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Request for links to resource "+resource+" in "+endpoint);
-        
-        try{
-        Repository repo = new SPARQLRepository(endpoint.toString());
-        repo.initialize();
-        RepositoryConnection con = repo.getConnection();
-        String request = "SELECT ?s ?p WHERE {  ?s ?p <" + resource + ">}";
-        TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
-        query.setIncludeInferred(false);
-        TupleQueryResult result = query.evaluate();
-        while (result.hasNext()) {
-            BindingSet bindingSet = result.next();
-            Value predicate = bindingSet.getValue("p");
-            Value subject = bindingSet.getValue("s");
-            RDFObject rdfObj = new RDFObject(subject, endpoint.toString());
-            ResourceProperty rp = new ResourceProperty(new Predicate(predicate, false), rdfObj);
-            observableList.add(rp);
-            asyncRefine(rp);
-        }
-        result.close();
-        con.close();
-        }catch(RepositoryException ex){
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Request for links to resource " + resource + " in " + endpoint);
+
+        try {
+            Repository repo = new SPARQLRepository(endpoint.toString());
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            String request = "SELECT ?s ?p WHERE {  ?s ?p <" + resource + ">}";
+            TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
+            query.setIncludeInferred(false);
+            TupleQueryResult result = query.evaluate();
+            while (result.hasNext()) {
+                BindingSet bindingSet = result.next();
+                Value predicate = bindingSet.getValue("p");
+                Value subject = bindingSet.getValue("s");
+                RDFObject rdfObj = new RDFObject(subject, endpoint.toString());
+                ResourceProperty rp = new ResourceProperty(new Predicate(predicate, false), rdfObj);
+                observableList.add(rp);
+                asyncRefine(rp);
+            }
+            result.close();
+            con.close();
+        } catch (RepositoryException ex) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, "On query to " + resource, ex);
             throw ex;
-        }
-        catch(MalformedQueryException ex){
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+        } catch (MalformedQueryException ex) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, "On query to " + resource, ex);
             throw ex;
-        }
-        catch(QueryEvaluationException ex){
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
+        } catch (QueryEvaluationException ex) {
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, "On query to " + resource, ex);
             throw ex;
         }
     }
@@ -139,7 +136,7 @@ public class SparqlSource {
             RepositoryConnection con = repo.getConnection();
             con.close();
         } catch (OpenRDFException e) {
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "No connectivity to "+sparqlEp);
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "No connectivity to " + sparqlEp);
             return false;
         }
         return true;
@@ -156,35 +153,33 @@ public class SparqlSource {
      * @throws QueryEvaluationException
      */
     public static boolean isPresent(String sparqlEp, String resource) throws RepositoryException, MalformedQueryException, QueryEvaluationException {
-        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Check if present. Resource: "+resource+" SPARQL ep: "+sparqlEp);
-        
-        try{
-        Repository repo = new SPARQLRepository(sparqlEp);
-        repo.initialize();
-        RepositoryConnection con = repo.getConnection();
-        String request = "SELECT COUNT (?p) AS ?cnt WHERE { <" + resource + "> ?p ?o}";
-        TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
-        query.setIncludeInferred(false);
-        TupleQueryResult result = query.evaluate();
-        boolean retVal = false;
-        BindingSet bindingSet = result.next();
-        Value v = bindingSet.getValue("cnt");
-        int cnt = Integer.valueOf(v.stringValue());
-        if (cnt > 0) {
-            retVal = true;
-        }
-        result.close();
-        con.close();
-        return retVal;
-        }catch(RepositoryException ex){
+        LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Check if present. Resource: " + resource + " SPARQL ep: " + sparqlEp);
+
+        try {
+            Repository repo = new SPARQLRepository(sparqlEp);
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            String request = "SELECT COUNT (?p) AS ?cnt WHERE { <" + resource + "> ?p ?o}";
+            TupleQuery query = con.prepareTupleQuery(QueryLanguage.SPARQL, request);
+            query.setIncludeInferred(false);
+            TupleQueryResult result = query.evaluate();
+            boolean retVal = false;
+            BindingSet bindingSet = result.next();
+            Value v = bindingSet.getValue("cnt");
+            int cnt = Integer.valueOf(v.stringValue());
+            if (cnt > 0) {
+                retVal = true;
+            }
+            result.close();
+            con.close();
+            return retVal;
+        } catch (RepositoryException ex) {
             LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             throw ex;
-        }
-        catch(MalformedQueryException ex){
+        } catch (MalformedQueryException ex) {
             LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             throw ex;
-        }
-        catch(QueryEvaluationException ex){
+        } catch (QueryEvaluationException ex) {
             LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.ERROR, ex);
             throw ex;
         }
@@ -206,11 +201,11 @@ public class SparqlSource {
 
     }
 
-    
     /**
-     * Class implements runnable interface to be started in a thread.
-     * The run()-method retrieves the resource description of a resource-object from a SPARQL endpoint
-     * and adds it to the object within a ResourceProperty and updates the list.
+     * Class implements runnable interface to be started in a thread. The
+     * run()-method retrieves the resource description of a resource-object from
+     * a SPARQL endpoint and adds it to the object within a ResourceProperty and
+     * updates the list.
      */
     private class MyRunnable implements Runnable {
 
@@ -223,7 +218,7 @@ public class SparqlSource {
         @SuppressWarnings("unchecked")
         @Override
         public void run() {
-            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Asynchronous request to "+prop.getRefValue().getValue()+" in "+prop.getRefValue().getOrigin());
+            LogManager.getLogger(SparqlSource.class).log(org.apache.logging.log4j.Level.INFO, "Asynchronous request to " + prop.getRefValue().getValue() + " in " + prop.getRefValue().getOrigin());
             try {
                 Repository repo = new SPARQLRepository(endpoint.toString());
                 repo.initialize();

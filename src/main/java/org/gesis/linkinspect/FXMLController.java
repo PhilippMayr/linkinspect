@@ -216,7 +216,6 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
 
             //create access objects to SPARQL endpoints and populate gui
             try {
-                Sample sample = testSet.getSample();
                 //for source
                 LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setup ResourceDisplay and SPARQLSource for source.");
                 rdSourceController.reset();
@@ -224,8 +223,6 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 rdSourceController.setOnObjectClickListener(this);
                 ObservableList<Object> ol = rdSourceController.getObservableList();
                 src = new SparqlSource(new URL(source), ol);
-                rdSourceController.setTitle(sample.getLeftResource());
-                src.requestResource(sample.getLeftResource());
                 //for target
                 LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setup ResourceDisplay and SPARQLSource for target.");
                 rdTargetController.reset();
@@ -233,9 +230,26 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 rdTargetController.setOnObjectClickListener(this);
                 ObservableList<Object> ol2 = rdTargetController.getObservableList();
                 tgt = new SparqlSource(new URL(target), ol2);
-                rdTargetController.setTitle(sample.getRightResource());
-                tgt.requestResource(sample.getRightResource());
-
+                //load and display data
+                {
+                    boolean success = false;
+                    while (!success) {
+                        try {
+                            updateTableData();
+                            success = true;
+                        } catch (QueryEvaluationException ex) {
+                            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "The dataset for " + testSet.getSample() + " is not valid.\nThe sample is removed from the testset.", ex);
+                            showError("The dataset for " + testSet.getSample() + " is not valid.\nThe sample is removed from the testset.");
+                            if (testSet.excludeSample(testSet.getSample())) {
+                                success = false;
+                            } else {
+                                showError("Unable to switch to next sample.\nPlease save your data.");
+                                break;
+                            }
+                        }
+                    }
+                    updateViews();
+                }
             } catch (MalformedURLException ex) {
                 LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + "Aborting setup");
                 showExceptionDialog(ex);
@@ -251,36 +265,8 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
                 showExceptionDialog(ex);
                 bpAll.getScene().setCursor(Cursor.DEFAULT);
                 return;
-            } catch (QueryEvaluationException ex) {
-                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, ex + "Aborting setup");
-                showExceptionDialog(ex);
-                bpAll.getScene().setCursor(Cursor.DEFAULT);
-                return;
             }
 
-            //fill out information labels
-            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setting label texts.");
-            lbFileValue.setText(linkFile.getFile().getName());
-            if (linkFile.getLinkType() != null) {
-                lbLinkTypeValue.setText(linkFile.getLinkType());
-            } else {
-                lbLinkTypeValue.setText("not set");
-            }
-            lbSourceValue.setText(source);
-            lbTargetValue.setText(target);
-
-            //determine button states
-            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Determining button states.");
-            determineNavigationButtonStates();
-            determineToggleButtonStates();
-            updateProgress();
-
-            //schedule delayed refresh for tableView
-            rdSourceController.invokeDelayedRefresh(3000);
-            rdSourceController.invokeDelayedRefresh(6000);
-            rdTargetController.invokeDelayedRefresh(3000);
-            rdTargetController.invokeDelayedRefresh(6000);
-            
             bpAll.getScene().setCursor(Cursor.DEFAULT);
             LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Setting up session done.");
         }
@@ -293,7 +279,8 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
      * @param rb
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle rb
+    ) {
         LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Initializing labels with \"not set\" text.");
         lbFileValue.setText("Not set");
         lbSourceValue.setText("Not set");
@@ -353,6 +340,65 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         alert.showAndWait();
     }
 
+    public void updateTableData() throws RepositoryException, MalformedQueryException, QueryEvaluationException {
+        //get sample at new position and display
+        Sample s = testSet.getSample();
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Load left hand resource.");
+        src.requestResource(s.getLeftResource());
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Load right hand resource.");
+        tgt.requestResource(s.getRightResource());
+        rdSourceController.setTitle(s.getLeftResource());
+        rdTargetController.setTitle(s.getRightResource());
+        //refresh table view        
+        rdSourceController.invokeDelayedRefresh(3000);
+        rdSourceController.invokeDelayedRefresh(6000);
+        rdTargetController.invokeDelayedRefresh(3000);
+        rdTargetController.invokeDelayedRefresh(6000);
+    }
+
+    public void updateViews() {
+
+        //adapt button states e.g. grey out next-button at end of set
+        determineNavigationButtonStates();
+        //set states of toggle buttons according to sample state
+        determineToggleButtonStates();
+        //determin ReportButton states
+        determineReportButtonStatus();
+        //update labels
+        updateLabels();
+        //update progress
+        updateProgress();
+
+    }
+
+    /**
+     * Updates the labels
+     */
+    private void updateLabels() {
+        //fill out information labels
+        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.DEBUG, "Setting label texts.");
+        if (settings.getLinkFile() != null && settings.getLinkFile().getFile() != null) {
+            lbFileValue.setText(settings.getLinkFile().getFile().getName());
+        } else {
+            lbFileValue.setText("not set");
+        }
+        if (settings.getLinkFile() != null && settings.getLinkFile().getLinkType() != null) {
+            lbLinkTypeValue.setText(settings.getLinkFile().getLinkType());
+        } else {
+            lbLinkTypeValue.setText("not set");
+        }
+        if (settings.getSrcSparqlEp() != null) {
+            lbSourceValue.setText(settings.getSrcSparqlEp());
+        } else {
+            lbSourceValue.setText("not set");
+        }
+        if (settings.getTrtSparqlEp() != null) {
+            lbTargetValue.setText(settings.getSrcSparqlEp());
+        } else {
+            lbTargetValue.setText("not set");
+        }
+    }
+
     /**
      * Handles the navigation actions
      *
@@ -370,28 +416,32 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             testSet.goToPrevious();
         }
         try {
-            //get sample at new position and display
-            Sample s = testSet.getSample();
-            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Load left hand resource.");
-            src.requestResource(s.getLeftResource());
-            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Load right hand resource.");
-            tgt.requestResource(s.getRightResource());
-            rdSourceController.setTitle(s.getLeftResource());
-            rdTargetController.setTitle(s.getRightResource());
-            rdSourceController.invokeDelayedRefresh(3000);
-            rdSourceController.invokeDelayedRefresh(6000);
-            rdTargetController.invokeDelayedRefresh(3000);
-            rdTargetController.invokeDelayedRefresh(6000);
+            //load and display data
+            {
+                boolean success = false;
+                while (!success) {
+                    try {
+                        updateTableData();
+                        success = true;
+                    } catch (QueryEvaluationException ex) {
+                        LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "The dataset for " + testSet.getSample() + " is not valid.\nThe sample is removed from the testset.", ex);
+                        showError("The dataset for " + testSet.getSample() + " is not valid.\nThe sample is removed from the testset.");
+                        if (testSet.excludeSample(testSet.getSample())) {
+                            success = false;
+                        } else {
+                            showError("Unable to switch to next sample.\nPlease save your data.");
+                            break;
+                        }
+                    }
+                }
+                updateViews();
+            }
         } catch (Exception ex) {
             LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Exceptiond during resource loading: " + ex);
             showExceptionDialog(ex);
             System.exit(-1);
         }
 
-        //adapt button states e.g. grey out next-button at end of set
-        determineNavigationButtonStates();
-        //set states of toggle buttons according to sample state
-        determineToggleButtonStates();
     }
 
     /**
@@ -650,7 +700,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
     @Override
     public void onPredicateClick(Predicate predicate) {
         try {
-            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Predicate clicked. Open link in plattform web browser: "+predicate.getValue());
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Predicate clicked. Open link in plattform web browser: " + predicate.getValue());
             Desktop desktop = Desktop.getDesktop();
             java.net.URI uri = java.net.URI.create(predicate.getValue());
             try {
@@ -672,12 +722,12 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
     @Override
     public void onObjectClick(RDFObject object) {
         try {
-            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Object clicked. Open link in linkinspect browser. Link: "+object.getValue()+", Origin: "+object.getOrigin());
+            LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.INFO, "Object clicked. Open link in linkinspect browser. Link: " + object.getValue() + ", Origin: " + object.getOrigin());
             if (SparqlSource.isPresent(object.getOrigin(), object.getValue())) {
                 ResourceDisplayDialog browser = new ResourceDisplayDialog(object.getValue(), object.getOrigin());
                 browser.showAndWait();
             } else {
-                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Resource: "+object.getValue()+" was not available in triplestore: "+object.getOrigin());
+                LogManager.getLogger(FXMLController.class).log(org.apache.logging.log4j.Level.ERROR, "Resource: " + object.getValue() + " was not available in triplestore: " + object.getOrigin());
                 showError("This resource is not available in the triplestore.");
             }
         } catch (Exception ex) {

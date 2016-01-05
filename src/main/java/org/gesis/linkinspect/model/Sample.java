@@ -61,7 +61,10 @@ public class Sample {
         return date;
     }
     
-    
+    @Override
+    public String toString(){
+        return "Sample: "+statement.toString()+" - "+state.name();
+    }
     
     
     

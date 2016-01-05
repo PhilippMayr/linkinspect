@@ -16,6 +16,7 @@ public class Testset extends ArrayList<Sample> {
 
     /**
      * Move index to next position
+     *
      * @return True if a next position is available
      */
     public boolean goToNext() {
@@ -28,6 +29,7 @@ public class Testset extends ArrayList<Sample> {
 
     /**
      * Move index to previous position
+     *
      * @return True if a previous position is available
      */
     public boolean goToPrevious() {
@@ -40,13 +42,13 @@ public class Testset extends ArrayList<Sample> {
 
     /**
      * Returns the current sample.
-     * @return 
+     *
+     * @return
      */
     public Sample getSample() {
         return this.get(position);
     }
 
-    
     public boolean hasNext() {
         if (position < this.size() - 1) {
             return true;
@@ -61,9 +63,10 @@ public class Testset extends ArrayList<Sample> {
         return false;
     }
 
-    
     /**
-     * Iterates through all elements and determines if no sample is in state OPEN or UNDEFINED
+     * Iterates through all elements and determines if no sample is in state
+     * OPEN or UNDEFINED
+     *
      * @return True if every sample is not open or undefined
      */
     public boolean isComplete() {
@@ -78,6 +81,7 @@ public class Testset extends ArrayList<Sample> {
 
     /**
      * Counts the correct samples.
+     *
      * @return Amount of correct samples.
      */
     public int getCorrect() {
@@ -92,6 +96,7 @@ public class Testset extends ArrayList<Sample> {
 
     /**
      * Counts the incorrect samples.
+     *
      * @return Amount of incorrect samples.
      */
     public int getIncorrect() {
@@ -106,6 +111,7 @@ public class Testset extends ArrayList<Sample> {
 
     /**
      * Count the undecidable samples.
+     *
      * @return Amount of undecidable samples.
      */
     public int getUndecidable() {
@@ -117,26 +123,51 @@ public class Testset extends ArrayList<Sample> {
         }
         return cnt;
     }
-    
-    
+
     /**
      * Returns the number of samples that are CORRECT, UNDECIDABLE or INCORRECT.
-     * @return 
+     *
+     * @return
      */
-    public int getEvaluated(){
-        int cnt=0; 
+    public int getEvaluated() {
+        int cnt = 0;
         for (int i = 0; i < size(); i++) {
             if (get(i).getState().equals(Sample.State.CORRECT)) {
                 cnt++;
-            }
-            else if (get(i).getState().equals(Sample.State.UNDECIDABLE)) {
+            } else if (get(i).getState().equals(Sample.State.UNDECIDABLE)) {
                 cnt++;
-            }
-            else if (get(i).getState().equals(Sample.State.INCORRECT)) {
+            } else if (get(i).getState().equals(Sample.State.INCORRECT)) {
                 cnt++;
             }
         }
         return cnt;
     }
 
+    /**
+     * Removes a sample from the testset.
+     *
+     * @param sample
+     */
+    public boolean excludeSample(Sample sample) {
+        boolean success = this.remove(sample);
+        if(success){
+            gotoFirstOpen();
+        }
+        return success;
+    }
+
+    /**
+     * Sets position to the first open sample in this set.
+     */
+    public void gotoFirstOpen(){
+        position =0;
+        for (int i = 0; i < size(); i++) {
+            if (get(i).getState().equals(Sample.State.OPEN)) {
+                position = i;
+                break;
+            }
+        }
+    }
+    
+    
 }
