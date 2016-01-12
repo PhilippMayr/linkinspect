@@ -393,7 +393,7 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
             lbSourceValue.setText("not set");
         }
         if (settings.getTrtSparqlEp() != null) {
-            lbTargetValue.setText(settings.getSrcSparqlEp());
+            lbTargetValue.setText(settings.getTrtSparqlEp());
         } else {
             lbTargetValue.setText("not set");
         }
