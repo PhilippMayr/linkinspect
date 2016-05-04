@@ -670,7 +670,9 @@ public class FXMLController implements Initializable, OnPredicateClickListener, 
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("About");
         alert.setHeaderText("Linkinspect v0.1");
-        alert.setContentText("Linkinspect was created in the context of the linked.swissbib project.\n\nVisit us on http://linked.swissbib.ch");
+        alert.setContentText("Linkinspect was created by GESIS in the context of "
+                + "the linked.swissbib project.\n\nVisit us on http://linked.swissbib.ch \n\n"
+                + "Linkinspect is open source and available under the LGPL v3.");
         alert.showAndWait();
     }
 
